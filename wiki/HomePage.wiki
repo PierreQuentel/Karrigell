@@ -1,0 +1,212 @@
+#summary Tutorial - building the home page
+#sidebar TableOfContents
+
+<wiki:toc max_depth="3" />
+
+= Home page =
+
+For the moment we'll ignore the CDs and begin writing the home page
+
+Create a new folder <font color="#106010" face="courier">mycds</font> in your Karrigell distribution, under the folder <font color="#106010" face="courier">www</font>. With your favorite text editor, save this text in a file called <font color="#106010" face="courier">index.py</font>
+{{{
+def index():
+    return "<h1>My CD collection</h1>"
+}}}
+In your browser enter _http://localhost/mycds/index.py/index_
+
+Karrigell maps urls to functions in Python scripts : here, _index.py/index_ means that the function <font color="#333388" size="2"><b>index()</b></font> will send the data back to the browser
+
+In fact
+
+  * if you don't specify a function name, the <font color="#333388" size="2"><b>index()</b></font> function in the script will be run, so you could have asked _localhost/mycds/index.py_
+  * and if you don't even specify a script name in a folder, the script <font color="#106010" face="courier">index.py</font> will be run. So all you have to type really is _localhost/mycds_
+
+Notice the <tt>return</tt> statement in the <font color="#333388" size="2"><b>index()</b></font> function. Karrigell sends the result of the function to the browser (more precisely, the string representation of the result) ; by default, this content is supposed to be HTML code
+
+= HTMLTags =
+
+Functions can return raw HTML strings, but Karrigell has a more elegant way of generating HTML. Rewrite the content of <font color="#106010" face="courier">index.py</font> with :
+
+{{{
+def index():
+    return H1("My CD collection")
+}}}
+
+The name <tt>H1</tt> matches the HTMLTags class H1 ; all valid HTML tags (including HTML5) have their name available in Python scripts (in uppercase letters)
+
+In the example the class H1 is instanciated with "My CD collection" as the first argument. The string representation of this instance is the matching HTML code
+
+Although you can write applications without using these names, it will make your code much cleaner and easier to review than with raw HTML strings
+
+= Adding a page counter =
+
+The page counter will print the number of times that the page has been seen. We'll use a file, <font color="#106010" face="courier">counter.txt</font>, to store the number of visits and increment it for each visit
+
+{{{
+def index():
+    body = H1("My CD collection")
+    try:
+        visits = int(open('counter.txt').read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    visits += 1
+    out = open('counter.txt','w')
+    out.write(str(visits))
+    out.close()
+    body += "%s visits" %visits
+    return body
+}}}
+Each time the page is reloaded, you will see the number of visits incremented by 1
+
+Notice that the file is opened by the usual <tt>open()</tt> function. The current directory is the one where the server script stands ; so you will see that the file <font color="#106010" face="courier">counter.txt</font> is located in the directory <font color="#106010" face="courier">www</font>, _not_ in the subdirectory <font color="#106010" face="courier">mycds</font>
+
+= A better page counter =
+
+A page counter should not increment if the same user repeatedly reloads the same page. This requires a way to identify the browser which is sending the request. For this task, web programming provides session management, and Karrigell has a very simple implementation of this concept
+
+Use the built-in <font color="#333388" size="2"><b>Session()</b></font> function
+
+Karrigell scripts are run in a namespace prepared by the framework : among the names available in scripts, you have this <font color="#333388" size="2"><b>Session()</b></font> function, which returns an object specific to each individual client (it uses cookies). This object is an ordinary Python dictionary, to which you can set key/value pairs
+
+Here, for a new client, we will create a key _user_ for the session object. If a client requests the home page and his session object already has this key, the counter will not be incremented
+{{{
+def index():
+    body = H1("My CD collection")
+    try:
+        visits = int(open('counter.txt').read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    if not "user" in Session():
+        visits += 1
+        out = open('counter.txt','w')
+        out.write(str(visits))
+        out.close()
+        Session()["user"] = None   # create attribute user
+    body += "%s visits" %visits
+    return body
+}}}
+= Importing scripts =
+
+This page counter could be used in other parts of the application, so it's better to put it in a separate file : save this part of the script in <font color="#106010" face="courier">counter.py</font>
+{{{
+def nb_visits():
+    try:
+        visits = int(open('counter.txt').read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    if not hasattr(Session(),"user"):
+        visits += 1
+        out = open('counter.txt','w')
+        out.write(str(visits))
+        out.close()
+        Session().user = None   # create attribute user
+    return visits
+}}}
+To use this script in the home page, change the script <font color="#106010" face="courier">index.py</font> to this :
+{{{
+counter = Import('counter.py')
+
+def index():
+    body = H1("My CD collection")
+    body += counter.nb_visits()+" visits"
+    return body
+}}}
+<font color="#333388" size="2"><b>Import()</b></font> is another Karrigell built-in function : it takes a script url as argument, and returns an object that behaves exactly like an imported module
+
+So, you may wonder, why not use the usual Python keyword <tt>import</tt> ? This is because of the mechanism used by the Python interpreter to find a module by its name : it searches a module of this name in a list of directories, and in a multi threaded environment such as a web server, there is no reliable way of being sure that the directory of a Karrigell script is inside this list
+
+= Logging in/out =
+
+Let's add a link for users to log in to the application
+{{{
+counter = Import('counter.py')
+
+def index():
+    body = H1("My CD collection")
+    body += A("Login",href="login")
+    body += counter.nb_visits()+" visits"
+    return body
+}}}
+To create the HTML anchor, we use the HTMLTags class A, with the text as first argument, and the attribute _href_ set to "login". The string representation of this instance will be
+{{{
+<a href="login">Login</a>
+}}}
+
+The _href_ attribute, "login", is a relative url to the base url, _host/mycds/index.py/index_, so it resolves to _host/mycds/index.py/login_, meaning that the link will invoke the execution of the function <font color="#333388" size="2"><b>login()</b></font> in the script <font color="#106010" face="courier">index.py</font>
+
+This function will generate an HTML form asking the user's login and password, and submitting these values to an authentication test
+{{{
+def login():
+    body = H1('Login')
+    form = FORM(action="check_login",method="post")
+    form <= 'Login '+INPUT(name="login")+BR()
+    form <= 'Password '+ INPUT(Type="password",name="passwd")
+    form <= INPUT(Type="submit",value="Ok")
+    body += form
+    return body
+}}}
+Note how the form is built : first the instance of FORM is created, with the attributes `action` and `method`. Then, the form fields are added using the operator `<=`. Of course it has nothing to do with "lesser or equal" : think of it as a left arrow, meaning "add child" to the tree node
+
+Also note that
+  * you can freely add tag objects and strings
+  * for attributes that have the same name as a Python keyword, such as `type` or `class`, you must capitalize the attribute name to avoid syntax errors
+
+The attribute "action" for the form is `check_login`. Again, this means that the function <font color="#333388" size="2"><b>check_login()</b></font> in <font color="#106010" face="courier">index.py</font> will be run
+
+Unlike <font color="#333388" size="2"><b>index()</b></font> and <font color="#333388" size="2"><b>login()</b></font>, this function will take arguments : the submitted login and password. The arguments must be called like the names used in the input fields of the form : `login` and `passwd`. For the moment we'll use a very simple test to see if the user is allowed to log in
+{{{
+def check_login(login,passwd):
+    if login=="john" and passwd=="doe":
+        Session()["user"] = login
+        return "logged in"
+    else:
+        return "try again"
+}}}
+Inside this function, if the test succeeds, the attribute user of the session object is set to the user's login
+
+For the moment, all we have is the result of the test. After the test, we should be automatically sent back to the home page. The HTTP protocol provides a redirection feature, and Karrigell implementation is once again very straightforward : a built-in exception called HTTP_REDIRECTION
+
+Change the function <font color="#333388" size="2"><b>check_login()</b></font> like this :
+{{{
+def check_login(login,passwd):
+    if login=="john" and passwd=="doe":
+        Session()["user"] = login
+        raise HTTP_REDIRECTION('index')
+    else:
+        return "try again"
+}}}
+This means that after the function is run, if the user is authenticated, the browser redirects to the specified url, here the one that matches the function <font color="#333388" size="2"><b>index()</b></font> in the script
+
+We can now change the home page to welcome the authenticated user with his name, and allow him to logout :
+{{{
+def index():
+    body = H1("My CD collection")
+    logged = "user" in Session()
+    if logged:
+        body += 'Logged in as %s' %Session()["user"]
+        body += BR()+A("Logout",href="logout")
+    else:
+        body += A("Login",href="login")
+    body += BR()+'%s visits' %counter.nb_visits()
+    return body
+}}}
+The <font color="#333388" size="2"><b>logout()</b></font> function will only remove the key _user_ from the session object and redirect to the home page :
+{{{
+def logout():
+    del Session()["user"]
+    raise HTTP_REDIRECTION("index")
+}}}
+= Summary =
+
+The programming style used by Karrigell is based on namespace : in the scripts, instead of importing modules or using environment variables, a number of built-in names are available for the most common tasks. So far we have covered 
+
+  * the names for the HTML tags
+  * session management with the built-in name <font color="#333388" size="2"><b>Session()</b></font>
+  * HTTP redirection with the built-in exception HTTP_REDIRECTION
+
+This makes programming with Karrigell extremely straightforward, thus easy to code and to maintain
+
+In the next section we will write the code to manage the CD database

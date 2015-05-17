@@ -1,0 +1,13 @@
+#summary Home page
+#labels Featured
+#sidebar TableOfContents
+
+= Introduction =
+
+Karrigell is a Pythonic web framework. The first version was published in 2002, many versions have been released, based on Python version 2. It is now switching to version 3. While the same choices remain, the Python3 version is not backwards-compatible with the previous ones
+
+The scripts in Karrigell use the usual Python syntax, with additional built-in names to manage web programming : there are names for cookie management, redirection, session handling, etc. 
+
+The package also includes 
+  * the HTMLTags module, with a name for all valid HTML tags, so that HTML code can be built with Python code instead of string with raw HTML code
+  * a simple templating system with no programatic controls (logic and loops etc to be handled in the calling Python script) 

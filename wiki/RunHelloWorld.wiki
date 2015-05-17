@@ -1,0 +1,30 @@
+#summary Run the "Hello world" script
+#sidebar TableOfContents
+
+Create a new directory. Save this script in a file called <font color="#106010" face="courier">index.py</font>:
+
+{{{
+def index():
+   return "Hello world"
+}}}
+
+Create another script called <font color="#106010" face="courier">server.py</font>:
+
+{{{
+import Karrigell
+Karrigell.run()
+}}}
+
+Save <font color="#106010" face="courier">server.py</font> in the same folder as <font color="#106010" face="courier">index.py</font>, then run it : 
+
+<code>python server.py</code>
+
+This will launch the built-in web server
+
+Finally, in a web browser enter the address _http://localhost/index.py/index_
+
+Congratulations, you just ran your first Karrigell script ! The address _index.py/index_ requested to run the function <font color="#338" size="2"><b>index()</b></font> in the script <font color="#106010" face="courier">index.py</font>. The value returned by this function is printed in the web browser
+
+In fact, you could have written the url _http://localhost/index.py_ : if no function name is specified, the function <font color="#338" size="2"><b>index()</b></font> is run by default, with no argument
+
+And you could even have called _http://localhost_ : if no script is specified, the server searches a script called <font color="#106010" face="courier">index.py</font> and if it finds one, it executes its function <font color="#338" size="2"><b>index()</b></font>

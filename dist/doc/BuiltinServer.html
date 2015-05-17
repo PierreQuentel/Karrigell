@@ -1,0 +1,61 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>BuiltinServer</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+
+<div>
+<table>
+ <tr>
+ 
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h1><a name="Server_options"></a>Server options<a href="#Server_options" class="section_anchor"></a></h1><p>The built-in server is started with the function </p><blockquote><h3><a name="Karrigell.run(_handler,port,apps,server,address___family_)"></a>Karrigell.run(<i>handler,port,apps,server,address<tt>_</tt>family</i>)<a href="#Karrigell.run(_handler,port,apps,server,address___family_)" class="section_anchor"></a></h3>
+</blockquote><blockquote><i>handler</i> is the class that manages requests (defaults to <font color="#338" size="2"><b>Karrigell.RequestHandler</b></font>) ; <i>port</i> defaults to 80 ; <i>apps</i> is the list of supported applications (defaults to <font color="#338" size="2"><b><tt>[Karrigell.App]</tt></b></font>) ; <i>server</i> defaults to <font color="#338" size="2"><b>socketserver.ThreadingTCPServer</b></font> from the Python standard distribution ; <i>address_family</i> defaults to <font color="#338" size="2"><b>socket.AF<tt>_</tt>INET</b></font> (IPv4) but can be set to <font color="#338" size="2"><b>socket.AF<tt>_</tt>INET6</b></font> to support IPv6 
+</blockquote><h1><a name="SSL_mode"></a>SSL mode<a href="#SSL_mode" class="section_anchor"></a></h1><p>The built-in server can be configured in SSL mode </p><p>For this, you must generate a key and certificate file (a file with the extension .pem). You can use OpenSSL for that : the instructions on how to generate such a file are explained in detail on the OpenSSL site </p><p><i>(Warning : on Windows, once the openssl.exe is installed, you are likely to have a message saying that the configuration file openssl.cnf is not found. You can fix this by adding -config /path/to/openssl/bin/openssl.cfg at the end of the request to create the file)</i> </p><p>The module <font color="#336633"><b>sslserver</b></font> provides the class <font color="#338" size="2"><b>SSLServer</b></font>. Its class attribute <font color="#338" size="2"><b>pem</b></font> must be set to the path of the .pem file. This class is passed to the <font color="#338" size="2"><b>run()</b></font> method of Karrigell </p><pre class="prettyprint">import Karrigell
+import Karrigell.sslserver
+
+# start the SSL web server on port 443 to serve this application
+server = Karrigell.sslserver.SSLServer
+server.pem = &quot;server.pem&quot; # replace with correct path
+Karrigell.run(server=server,port=443)</pre><p>This will serve requests like <i>https://localhost/script</i> on port 443 </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

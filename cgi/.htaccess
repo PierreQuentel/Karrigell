@@ -1,0 +1,15 @@
+# this is the .htaccess file for CGI mode
+Options -Indexes -MultiViews
+
+ErrorDocument 403 /cgi-bin/k_handler.cgi
+
+# rewrite urls so that Karrigell handles all scripts
+# excecpt those with static files extension
+
+RewriteEngine On
+RewriteCond  %{SCRIPT_FILENAME} !\.cgi$
+RewriteCond  %{SCRIPT_FILENAME} !\.(html|htm|css|js|jpg|jpeg|gif|png)$
+
+RewriteRule (.*) /cgi-bin/k_handler.cgi
+
+ 

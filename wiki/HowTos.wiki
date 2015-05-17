@@ -1,0 +1,13 @@
+#summary Karrigell HOWTOs
+#labels Featured
+#sidebar TableOfContents
+
+=HOWTO...=
+  * [http://code.google.com/p/karrigell/wiki/PronounceKarrigell Pronounce Karrigell]
+  * [http://code.google.com/p/karrigell/wiki/InstallIt Install the package]
+  * [http://code.google.com/p/karrigell/wiki/RunHelloWorld Run the "Hello World" script]
+  * [http://code.google.com/p/karrigell/wiki/UploadFiles Upload files]
+  * [http://code.google.com/p/karrigell/wiki/ManageEncoding Manage encoding]
+  * [http://code.google.com/p/karrigell/wiki/ManageCookies Set, read and erase cookies]
+  * [http://code.google.com/p/karrigell/wiki/ControlAccess Use an application filter to control access to files/directories]
+  * [http://code.google.com/p/karrigell/wiki/SmartUrl Manage "smart urls" with an application filter]

@@ -1,0 +1,18 @@
+#summary Importing a module
+#sidebar TableOfContents
+
+If you want to load a module in the Python standard distribution, or in a third-party package installed in the distribution, just use the usual
+{{{
+import some_module
+}}}
+
+You might also want to import a module specifically designed for your web application. In this case you can't use <font face="'Lucida Console',monospace" color="#606">import</font>, because of the algorithm used by the Python interpreter to find a module by its name : the interpreter searches for a module of the specified name in a list of folders, and you can't reliably modify this list to add your application folder, because in a multithreaded server you have no control on it
+
+So for this kind of module, you should use a different syntax :
+{{{
+mymodule = Import('mymodule.py')
+}}}
+
+The argument of <font face="'Lucida Console',monospace" color="#606">Import()</font> is the url for the module, it is resolved by the server as for all other urls
+
+An imported module can use all the built-in names defined by Karrigell : it can itself import other user-defined modules by <font face="'Lucida Console',monospace" color="#606">Import()</font>, use the names in HTMLTags, the cookies received by the importing script, etc

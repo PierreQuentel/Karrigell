@@ -1,0 +1,58 @@
+#summary How to get started with Karrigell
+#labels Featured
+#sidebar TableOfContents
+
+= Installation =
+
+Download the package from the [http://code.google.com/p/karrigell/downloads/list downloads] page
+
+Unpack it in some directory, then open a console window and in this directory, run <code>python setup.py install</code>
+
+To test that everything works, go to the subdirectory <font color="#106010" face="courier">www</font> and run <code>python server.py</code>
+
+This will start the built-in server on port 80. If you want another port, edit <font color="#106010" face="courier">server.py</font> and change the last line
+
+{{{
+Karrigell.run(apps=[MyApp])
+}}}
+
+to 
+
+{{{
+Karrigell.run(apps=[MyApp],port=8000)
+}}}
+
+The server supports IPv6. To specify it, set the option <font color="#333388" size="2"><b>address_family</b></font> to <font color="#333388" size="2"><b>socket.AF_INET6</b></font>
+
+Once the server is started, type <i>`http://localhost`</i> in a browser (or <i>`http://localhost:8000`</i>). If all went well, a home page is displayed
+
+Click on the link "Login". Since it's the first connection, no user has already been identified, so you should enter a login and password for the administrator
+
+When this is done, the home page prints your login, and there is a link to a users management script
+
+= Introduction to scripts =
+
+Karrigell scripts are pure Python scripts, run in a namespace prepared by the framework. Requests are managed by functions defined in the scripts : the url <i>`http://host/path/foo.py/bar`</i> is managed by the function bar of script <font color="#106010" face="courier">foo.py</font>
+
+The matching between host/path and the directory where the script stands is defined by the application settings (see ApplicationSettings)
+
+An application with several pages can be defined in a single Python script :
+
+{{{
+head = HEAD(TITLE("Cities"))
+
+def index():
+        form = FORM(action="show")
+        form <= INPUT(name="city")
+        form <= INPUT(Type="submit",value="Ok")
+        return HTML(head+BODY(form))
+ 
+def show(city):
+        return HTML(head+BODY(city))
+}}}
+
+In this simple example, the function <font color="#333388" size="2"><b>index()</b></font> returns an HTML page with a form to be filled by the user. The attribute _action_ of this form tells the framework to target the function <font color="#333388" size="2"><b>show()</b></font>, and passes the argument _city_ to this function. Here, the function just echoes the value
+
+The names in uppercase letters (HEAD, FORM, etc) are in the execution namespace : they match all the valid HTML tags and are used to generate HTML code. See [WriteHtml HTML Tags] for more information
+
+The names defined at the script level are available in all functions : here, the name <tt>head</tt> can be used in both functions to return the same HTML header with the page title

@@ -1,0 +1,111 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>GettingStarted</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h1><a name="Installation"></a>Installation<a href="#Installation" class="section_anchor"></a></h1><p>Download the package from the <a href="http://code.google.com/p/karrigell/downloads/list" rel="nofollow">downloads</a> page </p><p>Unpack it in some directory, then open a console window and in this directory, run <pre class="prettyprint">python setup.py install</pre> </p><p>To test that everything works, go to the subdirectory <font color="#106010" face="courier">www</font> and run <pre class="prettyprint">python server.py</pre> </p><p>This will start the built-in server on port 80. If you want another port, edit <font color="#106010" face="courier">server.py</font> and change the last line </p><pre class="prettyprint">Karrigell.run(apps=[MyApp])</pre><p>to  </p><pre class="prettyprint">Karrigell.run(apps=[MyApp],port=8000)</pre><p>The server supports IPv6. To specify it, set the option <font color="#333388" size="2"><b>address_family</b></font> to <font color="#333388" size="2"><b>socket.AF_INET6</b></font> </p><p>Once the server is started, type <i><tt>http://localhost</tt></i> in a browser (or <i><tt>http://localhost:8000</tt></i>). If all went well, a home page is displayed </p><p>Click on the link &quot;Login&quot;. Since it&#x27;s the first connection, no user has already been identified, so you should enter a login and password for the administrator </p><p>When this is done, the home page prints your login, and there is a link to a users management script </p><h1><a name="Introduction_to_scripts"></a>Introduction to scripts<a href="#Introduction_to_scripts" class="section_anchor"></a></h1><p>Karrigell scripts are pure Python scripts, run in a namespace prepared by the framework. Requests are managed by functions defined in the scripts : the url <i><tt>http://host/path/foo.py/bar</tt></i> is managed by the function bar of script <font color="#106010" face="courier">foo.py</font> </p><p>The matching between host/path and the directory where the script stands is defined by the application settings (see <a href="ApplicationSettings.html">ApplicationSettings</a>) </p><p>An application with several pages can be defined in a single Python script : </p><pre class="prettyprint">head = HEAD(TITLE(&quot;Cities&quot;))
+
+def index():
+        form = FORM(action=&quot;show&quot;)
+        form &lt;= INPUT(name=&quot;city&quot;)
+        form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+        return HTML(head+BODY(form))
+ 
+def show(city):
+        return HTML(head+BODY(city))</pre><p>In this simple example, the function <font color="#333388" size="2"><b>index()</b></font> returns an HTML page with a form to be filled by the user. The attribute <i>action</i> of this form tells the framework to target the function <font color="#333388" size="2"><b>show()</b></font>, and passes the argument <i>city</i> to this function. Here, the function just echoes the value </p><p>The names in uppercase letters (HEAD, FORM, etc) are in the execution namespace : they match all the valid HTML tags and are used to generate HTML code. See <a href="WriteHtml.html">HTML Tags</a> for more information </p><p>The names defined at the script level are available in all functions : here, the name <tt>head</tt> can be used in both functions to return the same HTML header with the page title </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

@@ -1,0 +1,123 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>SmartUrl</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Application filter provide a very powerful and flexible way of customizing the way Karrigell manages requests </p><p>This <tt>HowTo</tt> (written by Jim Eggleston) shows how it can be used to manage &quot;smart urls&quot; ; let&#x27;s take the example of a Wiki application where we want urls like <i><tt>http://kswiki/index.py/show/MyWikiPage</tt></i> </p><p>Basically Karrigell would return a 404 Not found error. However it can be made to work using an app filter.  </p><p>This is a sample <font color="#106010" face="courier">server.py</font> : </p><pre class="prettyprint">import urllib.parse
+import Karrigell
+
+class ktwiki(Karrigell.App):
+
+    def ktwiki_filter(self,handler):
+        pth = handler.path_info
+        parts = urllib.parse.unquote(pth).split(&#x27;/&#x27;)
+        if len(parts) &lt; 5:
+            return None   # normal URL, no processing required
+        newpth = &#x27;/&#x27;.join(parts[:-1])
+        handler.body[&#x27;pageName&#x27;] = parts[-1]
+        return handler.get_file(newpth)
+
+    filters = [ktwiki_filter]
+
+
+Karrigell.run(apps=[ktwiki]) </pre><p>This is what is happening, firstly at a high level, then in more detail. </p><p>ktwiki_filter is the filter method. You have to tell Karrigell what the filter functions are for your app by assigning a list of methods to the the filters attribute of the app class (ktwiki in this case.) The Karrigell request handler will call each filter function for the app after it has parsed the URL but before attempts to process it. </p><p>Looking at the filter method ktwiki_filter, you will see it takes the parameter handler, that is, the request handler object. The handler object holds the data and methods required to process requests. It is the handler object that we will be manipulating. </p><p>To handle a URL like <i><tt>/ktwiki/index.py/show/MyWikiPage</tt></i>, <tt>MyWikiPage</tt> has to be trimmed off the end. <tt>MyWikiPage</tt> has to be put somewhere where the show() function in <font color="#106010" face="courier">index.py</font> can get to it. </p><p>Ok, now I&#x27;ll step through ktwiki_filter: </p><p>First I get the URL passed to Karrigell: </p><pre class="prettyprint">    pth = handler.path_info</pre><p>Then I unquote it and split it into parts: </p><pre class="prettyprint">    parts = urllib.parse.unquote(pth).split(&#x27;/&#x27;)</pre><p>In this application, if there are less than 5 parts, then no processing is required. Return None and let Karrigell handle the URL </p><pre class="prettyprint">    if len(parts) &lt; 5:
+        return None   # normal URL, no processing required</pre><p>The new path consists of the first four elements: </p><pre class="prettyprint">    newpth = &#x27;/&#x27;.join(parts[:-1])</pre><p>The last part of the URL is the Wiki page name. This needs to be passed to the show() function. Parameters passed to functions are held as key/value pairs in the request body (handler.body) so that&#x27;s where we&#x27;ll save the page name: </p><pre class="prettyprint">    handler.body[&#x27;pageName&#x27;] = parts[-1]</pre><p>Finally we return the physical path of the resource. I am using the get_file() method of the handler object to do the work: </p><pre class="prettyprint">    return handler.get_file(newpth)</pre><p>The show() function in index.py looks like this. It will receive pageName as a parameter: </p><pre class="prettyprint">def show(pageName=None):
+    if pageName is None:
+        # raise exception
+   # Process page  ... </pre>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

@@ -1,0 +1,131 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>ManageCookies</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Cookies are managed by two variables available in the scripts : </p><ul><li>COOKIE is a dictionary-like object holding the cookies sent by the browser and received by the script </li><li>SET_COOKIE is a dictionary-like object used by the script to set cookies values, path, expiry date etc. and send them to the browser </li></ul><p>Here is a simple script, <font color="#106010" face="courier">cookies.py</font>, that shows how to set, read and erase cookies : </p><pre class="prettyprint">def index(**kw):
+    body = &#x27;Received cookies&#x27;
+    for cookie in COOKIE:
+        body += BR()+B(cookie)+&#x27;&amp;nbsp;&#x27;+COOKIE[cookie].value
+        body += A(&#x27;Erase&#x27;,href=&quot;erase?name=%s&quot; %cookie)
+    form = FORM(action =&quot;set_cookie&quot;,method=&quot;post&quot;)
+    form &lt;= &#x27;Name&#x27;+INPUT(name=&quot;name&quot;)+BR()
+    form &lt;= &#x27;Value&#x27; + INPUT(name=&quot;value&quot;)+BR()
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    return HTML(BODY(body+form))
+ 
+def set_cookie(name,value):
+    SET_COOKIE[name] = value
+    SET_COOKIE[name][&#x27;path&#x27;] = &#x27;/&#x27;
+    raise HTTP_REDIRECTION(&#x27;index&#x27;)
+ 
+def cookie_expiry_date(numdays): 
+    &quot;&quot;&quot; Returns a cookie expiry date in the required format.
+    `expires` should be a string in the format &quot;Wdy, DD-Mon-YY HH:MM:SS GMT&quot;
+    &quot;&quot;&quot; 
+    from datetime import date, timedelta 
+    new = date.today() + timedelta(days = numdays) 
+    return new.strftime(&quot;%a, %d-%b-%Y 23:59:59 GMT&quot;) 
+ 
+def erase(name):
+    SET_COOKIE[name] = &#x27;&#x27;
+    SET_COOKIE[name][&#x27;path&#x27;] = &#x27;/&#x27;
+    SET_COOKIE[name][&#x27;expires&#x27;] = cookie_expiry_date(-10)
+    SET_COOKIE[name][&#x27;max-age&#x27;] = 0
+    raise HTTP_REDIRECTION(&#x27;index&#x27;)</pre><p>In index(), the cookies sent by the browser are printed. Then a form allows the user to set another cookie, with a specified name and value </p><p>This form is submitted to the function set_cookie(name,value). In this function, a new entry is created in SET_COOKIE with the submitted data. The key &#x27;path&#x27; of this entry is set to the server root. Then a redirection is performed to the index() function </p><p>When this redirection is done, the newly created cookie is sent to the browser. The browser stores the value and its attribute ; then it sends a request to the url <i>http://host/cookies.py/index</i> </p><p>When this request is sent, the request headers include this cookie, received by the script in the variable COOKIE : so the cookie name and value are printed at the top of the page </p><p>To erase the cookie, a link is provided, leading to the function erase(name) where name is the cookie name. The function erase() uses SET_COOKIE to erase the value, and set the expiry date to the past (10 days before today), using the function cookie_expiry_date() to transform a datetime object to the format supported by the cookie specifications </p><p>At last, when these values are set for the cookie, another redirection is performed to index() : the browser receives the new information about the specified cookie. Since the expiry date is reached, it erases it. When it sends a request to <i>http://host/cookies.py/index</i>, it does not send a header for this cookie, which does not appear in the received cookies list </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

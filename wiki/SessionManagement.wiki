@@ -1,0 +1,55 @@
+#summary Session management
+#sidebar TableOfContents
+
+Session management is very straightforward : the built-in function <font color="#338" size="2"><b>Session()</b></font> returns a session object that can be used to store user-specific information during his navigation on the site
+
+The server sets a cookie identifying the user and the application he is using : the session object is different for different applications run by the same user
+
+Session objects are dictionary-like objects. Except in the case when they are stored in memory, values can only be built-in Python types (strings, numbers, lists, dicts...)
+
+The storage mechanism is managed by an object defining how to store and retrieve the session object. An application defines its session storage by the class attribute <font color="#338" size="2"><b>session_storage</b></font>
+
+For instance :
+
+{{{
+class App(Karrigell.App):
+
+    session_storage = SQLiteSessionStorage("c:/projects/data/sessions.sql")
+}}}
+
+= Built-in session storage classes =
+
+Karrigell provides 3 classes, in the module <font color="#336633"><b>sessions.py</b></font> of the Karrigell distribution :
+
+==SQLiteSessionStorage==
+
+ ===SQLiteSessionStorage(_path_)===
+ _path_ is the path of the SQLite database in the file system
+
+ With this class, the session object is serialized with the <font color="#336633"><b>pickle</b></font> module, and written in a SQLite database. Each record in this database is identified by a session identifier, stored as a cookie on the user's browser
+
+ With this storage, only built-in Python types can be stored in the session object ; instances of user-defined classes or objects like database connections can't be set as attributes to the session object
+
+ The class has one attribute :
+
+  * <font color="#338" size="2"><b>max_sessions</b></font> : the maximum number of sessions (defaults to 100)
+
+==!FileSessionStorage==
+
+ ===!FileSessionStorage(_session_dir_)===
+ _session_dir_ is the directory where session files will be stored
+
+ Stores the serialized session object in a file, one per user. As for SQLite, only built-in Python types can be stored in the session object
+
+==!MemorySessionStorage==
+ Stores the session object in memory. It only works on a mono process web server. In this case, arbitrary objects can be stored, including non built-in Python objects (e.g. database connections)
+
+= Customized session storage classes =
+
+If you want to create a custom session storage class, it must define two methods :
+
+ ===save(_handler_)===
+ This method takes the instance of <font color="#338" size="2"><b>`Karrigell.RequestHandler`</b></font> and specifies how the session object should be stored. The session object is the attribute <font color="#338" size="2"><b>session_object</b></font> of the parameter _handler_
+
+ ===get(_session`_`id_)===
+ This method takes the session identifier and returns the matching session object

@@ -1,0 +1,113 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>UploadFiles</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Create another script called <font color="#106010" face="courier">upload.py</font> : </p><pre class="prettyprint">def index():
+    form = FORM(action=&quot;upload&quot;,method=&quot;post&quot;,enctype=&quot;multipart/form-data&quot;)
+    form &lt;= INPUT(Type=&quot;file&quot;,name=&quot;src&quot;)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    return HTML(BODY(form))
+ 
+def upload(src):
+    import mimetypes
+    gtype,encoding = mimetypes.guess_type(src.filename)
+    RESPONSE_HEADERS[&#x27;Content-type&#x27;] = gtype
+    data = src.file.read()
+    return data</pre><p>The function index() looks like the previous example. The changes are the enctype parameter of the FORM, set to &quot;multipart/form-data&quot; ; and the type of the first INPUT field </p><p>In the upload function, we receive the argument src. Since it was sent as a file inside a multipart/form-data form, this object has an attribute filename matching the name of the uploaded file ; it also has an attribute file, a file-like object with a method read() that returns bytes. </p><p>The Python module <font color="#336633" size="2"><b><tt>mimetypes</tt></b></font> can guess the type of this file by its extension ; for instance if the uploaded file was a JPEG image, with the extension .jpg, the result of mimetypes.guess_type(src.filename) will be &quot;image/pjpeg&quot; </p><p>The line </p><pre class="prettyprint">RESPONSE_HEADERS[&#x27;Content-type&#x27;] = gtype</pre><p>uses another name which is always available in Python scripts run by Karrigell : RESPONSE_HEADERS. It is a dictionary-like object (in fact, an instance of class <font color="#336633" size="2"><b><tt>email.message.Message</tt></b></font>, used to set the response headers that will be sent to the web browser. Here, the line sets the Content-type header to the type of the file received </p><p>In the next line we read the binary data from the attribute &quot;file&quot; of src, and finally return this binary data. The Karrigell engine sends the response headers, then the binary data ; with this information, the browser renders the file content under the appropriate format : if the file was a JPEG picture, the browser prints it </p><h2><a name="Warning"></a>Warning<a href="#Warning" class="section_anchor"></a></h2><p>The <i>action</i> parameter of a form must match the function in the targetted script ; if this function is <font color="#338" size="2"><b>index()</b></font> in script <font color="#106010" face="courier">foo.py</font>, <i>action</i> must be <font color="#338" size="2"><b>foo.py/index</b></font>, not just <font color="#338" size="2"><b>foot.py</b></font> : in the second case, the form will be redirected by Karrigell to <font color="#338" size="2"><b>foo.py/index</b></font>, but all form data will be lost in the redirection </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

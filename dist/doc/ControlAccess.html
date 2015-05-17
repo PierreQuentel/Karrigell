@@ -1,0 +1,129 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>ControlAccess</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <h1><a name="Introduction"></a>Introduction<a href="#Introduction" class="section_anchor"></a></h1><p>App filters are defined as methods of application classes, in <font color="#106010" face="courier">server.py</font> or the equivalent Karrigell start up script. The application class has an attribute &quot;filters&quot;, the list of filter functions to call one after the other for each request </p><p>Each filter accepts the Karrigell handler object as parameter. This object holds the request information : path info, cookies, request handlers, etc </p><p>A filter returns <font color="#333388"><b>None</b></font> is there is nothing special to do ; control is passed to the next filter in the list </p><p>If an HTTP error response should be sent (for instance the 403 error, Forbidenn Access), the filter raises HTTP_ERROR(err_code) ; if an HTTP redirection is required to another script, the filter function raises HTTP_REDIRECTION(new_url). Finally, if the function returns a value other than <font color="#333388"><b>None</b></font>, it is the physical path to the resource </p><p>Effectively this means you can intercept the URL and change the way it is handled by Karrigell </p><h1><a name="Hide_access_to_files_with_specified_extensions"></a>Hide access to files with specified extensions<a href="#Hide_access_to_files_with_specified_extensions" class="section_anchor"></a></h1><p>This script forbids access to files with the extension sqlite : </p><pre class="prettyprint">import Karrigell
+
+class App(Karrigell.App):
+
+    hidden = [&#x27;.sqlite&#x27;]
+
+    def hide_ext(self,handler):
+        for ext in self.hidden:
+            if handler.path_info.endswith(ext):
+                raise Karrigell.HTTP_ERROR(403)
+
+    filters = [hide_ext]
+
+Karrigell.run(apps=[App])</pre><h1><a name="Restrict_access_to_directories_to_site_administrator"></a>Restrict access to directories to site administrator<a href="#Restrict_access_to_directories_to_site_administrator" class="section_anchor"></a></h1><pre class="prettyprint">import Karrigell
+
+class App(Karrigell.App):
+
+    protected_path = [&#x27;foo&#x27;]
+
+    def control_access(self,handler):
+        path = handler.path_info.split(&#x27;/&#x27;)
+        if path[1] in self.protected_path and handler.role() != &#x27;admin&#x27;:
+            raise Karrigell.HTTP_ERROR(403)
+
+    filters = [control_access]
+
+Karrigell.run(apps=[App])
+</pre>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

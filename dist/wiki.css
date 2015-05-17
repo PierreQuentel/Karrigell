@@ -1,0 +1,88 @@
+body {
+    background:#fff;
+    font-family: arial,sans-serif;
+    margin:8px;
+}
+
+div {font-size: 13px;}
+
+#title{
+    text-align: center;
+    background-color:#eee;
+    font-size:large;
+    font-weight:bold;
+    padding:15px;
+}
+
+#wikicontent code, tt, #wikicontent pre,
+#wikipreview code, tt, #wikipreview pre {
+  font-family: Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+  font-size: 93%;
+  max-width: 66em;
+}
+
+pre.prettyprint {
+  padding: 0.5em;
+  overflow: auto;
+  font-family: Monaco, 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Lucida Console', monospace;
+  font-size: 93%;
+}
+
+#wikicontent pre.prettyprint,
+#wikipreview pre.prettyprint {
+  background-color: #eee;
+  max-width: 70em;
+}
+
+#wikipage {
+  background: #f8f8f8;
+  padding-bottom: 10px;
+}
+
+#wikimaincol {
+  padding: 5px 25px 10px 10px;
+  background-color: #fff;
+}
+
+.prettyprint .str { color: #080; }
+.prettyprint .kwd { color: #008; }
+.prettyprint .com { color: #800; }
+.prettyprint .typ { color: #606; }
+.prettyprint .lit { color: #066; }
+.prettyprint .pun { color: #660; }
+.prettyprint .pln { color: #000; }
+.prettyprint .tag { color: #008; }
+.prettyprint .atn { color: #606; }
+.prettyprint .atv { color: #080; }
+.prettyprint .dec { color: #606; }
+
+@media print {
+  .prettyprint .str { color: #060; }
+  .prettyprint .kwd { color: #006; font-weight: bold; }
+  .prettyprint .com { color: #600; font-style: italic; }
+  .prettyprint .typ { color: #404; font-weight: bold; }
+  .prettyprint .lit { color: #044; }
+  .prettyprint .pun { color: #440; }
+  .prettyprint .pln { color: #000; }
+  .prettyprint .tag { color: #006; font-weight: bold; }
+  .prettyprint .atn { color: #404; }
+  .prettyprint .atv { color: #060; }
+}
+
+table {
+	width: 100%;
+}
+td.sidebarcontent {
+	width: 23%;
+}
+
+#sidebarcontainer a {
+	color: #006;
+	text-decoration: none;
+}
+#sidebarcontainer a:visited {
+	color: #006;
+}
+#sidebarcontainer a:hover {
+	color: #66C;
+}

@@ -1,0 +1,181 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>HomePage</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p><ul><li><a href="#Home_page">Home page</a></li><li><a href="#HTMLTags">HTMLTags</a></li><li><a href="#Adding_a_page_counter">Adding a page counter</a></li><li><a href="#A_better_page_counter">A better page counter</a></li><li><a href="#Importing_scripts">Importing scripts</a></li><li><a href="#Logging_in/out">Logging in/out</a></li><li><a href="#Summary">Summary</a></li></ul> </p><h1><a name="Home_page"></a>Home page<a href="#Home_page" class="section_anchor"></a></h1><p>For the moment we&#x27;ll ignore the CDs and begin writing the home page </p><p>Create a new folder <font color="#106010" face="courier">mycds</font> in your Karrigell distribution, under the folder <font color="#106010" face="courier">www</font>. With your favorite text editor, save this text in a file called <font color="#106010" face="courier">index.py</font> </p><pre class="prettyprint">def index():
+    return &quot;&lt;h1&gt;My CD collection&lt;/h1&gt;&quot;</pre><p>In your browser enter <i>http://localhost/mycds/index.py/index</i> </p><p>Karrigell maps urls to functions in Python scripts : here, <i>index.py/index</i> means that the function <font color="#333388" size="2"><b>index()</b></font> will send the data back to the browser </p><p>In fact </p><ul><li>if you don&#x27;t specify a function name, the <font color="#333388" size="2"><b>index()</b></font> function in the script will be run, so you could have asked <i>localhost/mycds/index.py</i> </li><li>and if you don&#x27;t even specify a script name in a folder, the script <font color="#106010" face="courier">index.py</font> will be run. So all you have to type really is <i>localhost/mycds</i> </li></ul><p>Notice the <tt>return</tt> statement in the <font color="#333388" size="2"><b>index()</b></font> function. Karrigell sends the result of the function to the browser (more precisely, the string representation of the result) ; by default, this content is supposed to be HTML code </p><h1><a name="HTMLTags"></a>HTMLTags<a href="#HTMLTags" class="section_anchor"></a></h1><p>Functions can return raw HTML strings, but Karrigell has a more elegant way of generating HTML. Rewrite the content of <font color="#106010" face="courier">index.py</font> with : </p><pre class="prettyprint">def index():
+    return H1(&quot;My CD collection&quot;)</pre><p>The name <tt>H1</tt> matches the HTMLTags class H1 ; all valid HTML tags (including HTML5) have their name available in Python scripts (in uppercase letters) </p><p>In the example the class H1 is instanciated with &quot;My CD collection&quot; as the first argument. The string representation of this instance is the matching HTML code </p><p>Although you can write applications without using these names, it will make your code much cleaner and easier to review than with raw HTML strings </p><h1><a name="Adding_a_page_counter"></a>Adding a page counter<a href="#Adding_a_page_counter" class="section_anchor"></a></h1><p>The page counter will print the number of times that the page has been seen. We&#x27;ll use a file, <font color="#106010" face="courier">counter.txt</font>, to store the number of visits and increment it for each visit </p><pre class="prettyprint">def index():
+    body = H1(&quot;My CD collection&quot;)
+    try:
+        visits = int(open(&#x27;counter.txt&#x27;).read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    visits += 1
+    out = open(&#x27;counter.txt&#x27;,&#x27;w&#x27;)
+    out.write(str(visits))
+    out.close()
+    body += &quot;%s visits&quot; %visits
+    return body</pre><p>Each time the page is reloaded, you will see the number of visits incremented by 1 </p><p>Notice that the file is opened by the usual <tt>open()</tt> function. The current directory is the one where the server script stands ; so you will see that the file <font color="#106010" face="courier">counter.txt</font> is located in the directory <font color="#106010" face="courier">www</font>, <i>not</i> in the subdirectory <font color="#106010" face="courier">mycds</font> </p><h1><a name="A_better_page_counter"></a>A better page counter<a href="#A_better_page_counter" class="section_anchor"></a></h1><p>A page counter should not increment if the same user repeatedly reloads the same page. This requires a way to identify the browser which is sending the request. For this task, web programming provides session management, and Karrigell has a very simple implementation of this concept </p><p>Use the built-in <font color="#333388" size="2"><b>Session()</b></font> function </p><p>Karrigell scripts are run in a namespace prepared by the framework : among the names available in scripts, you have this <font color="#333388" size="2"><b>Session()</b></font> function, which returns an object specific to each individual client (it uses cookies). This object is an ordinary Python dictionary, to which you can set key/value pairs </p><p>Here, for a new client, we will create a key <i>user</i> for the session object. If a client requests the home page and his session object already has this key, the counter will not be incremented </p><pre class="prettyprint">def index():
+    body = H1(&quot;My CD collection&quot;)
+    try:
+        visits = int(open(&#x27;counter.txt&#x27;).read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    if not &quot;user&quot; in Session():
+        visits += 1
+        out = open(&#x27;counter.txt&#x27;,&#x27;w&#x27;)
+        out.write(str(visits))
+        out.close()
+        Session()[&quot;user&quot;] = None   # create attribute user
+    body += &quot;%s visits&quot; %visits
+    return body</pre><h1><a name="Importing_scripts"></a>Importing scripts<a href="#Importing_scripts" class="section_anchor"></a></h1><p>This page counter could be used in other parts of the application, so it&#x27;s better to put it in a separate file : save this part of the script in <font color="#106010" face="courier">counter.py</font> </p><pre class="prettyprint">def nb_visits():
+    try:
+        visits = int(open(&#x27;counter.txt&#x27;).read())
+    except IOError:
+        # first visit : the file does not exist
+        visits = 0
+    if not hasattr(Session(),&quot;user&quot;):
+        visits += 1
+        out = open(&#x27;counter.txt&#x27;,&#x27;w&#x27;)
+        out.write(str(visits))
+        out.close()
+        Session().user = None   # create attribute user
+    return visits</pre><p>To use this script in the home page, change the script <font color="#106010" face="courier">index.py</font> to this : </p><pre class="prettyprint">counter = Import(&#x27;counter.py&#x27;)
+
+def index():
+    body = H1(&quot;My CD collection&quot;)
+    body += counter.nb_visits()+&quot; visits&quot;
+    return body</pre><p><font color="#333388" size="2"><b>Import()</b></font> is another Karrigell built-in function : it takes a script url as argument, and returns an object that behaves exactly like an imported module </p><p>So, you may wonder, why not use the usual Python keyword <tt>import</tt> ? This is because of the mechanism used by the Python interpreter to find a module by its name : it searches a module of this name in a list of directories, and in a multi threaded environment such as a web server, there is no reliable way of being sure that the directory of a Karrigell script is inside this list </p><h1><a name="Logging_in/out"></a>Logging in/out<a href="#Logging_in/out" class="section_anchor"></a></h1><p>Let&#x27;s add a link for users to log in to the application </p><pre class="prettyprint">counter = Import(&#x27;counter.py&#x27;)
+
+def index():
+    body = H1(&quot;My CD collection&quot;)
+    body += A(&quot;Login&quot;,href=&quot;login&quot;)
+    body += counter.nb_visits()+&quot; visits&quot;
+    return body</pre><p>To create the HTML anchor, we use the HTMLTags class A, with the text as first argument, and the attribute <i>href</i> set to &quot;login&quot;. The string representation of this instance will be </p><pre class="prettyprint">&lt;a href=&quot;login&quot;&gt;Login&lt;/a&gt;</pre><p>The <i>href</i> attribute, &quot;login&quot;, is a relative url to the base url, <i>host/mycds/index.py/index</i>, so it resolves to <i>host/mycds/index.py/login</i>, meaning that the link will invoke the execution of the function <font color="#333388" size="2"><b>login()</b></font> in the script <font color="#106010" face="courier">index.py</font> </p><p>This function will generate an HTML form asking the user&#x27;s login and password, and submitting these values to an authentication test </p><pre class="prettyprint">def login():
+    body = H1(&#x27;Login&#x27;)
+    form = FORM(action=&quot;check_login&quot;,method=&quot;post&quot;)
+    form &lt;= &#x27;Login &#x27;+INPUT(name=&quot;login&quot;)+BR()
+    form &lt;= &#x27;Password &#x27;+ INPUT(Type=&quot;password&quot;,name=&quot;passwd&quot;)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    body += form
+    return body</pre><p>Note how the form is built : first the instance of FORM is created, with the attributes <tt>action</tt> and <tt>method</tt>. Then, the form fields are added using the operator <tt>&lt;=</tt>. Of course it has nothing to do with &quot;lesser or equal&quot; : think of it as a left arrow, meaning &quot;add child&quot; to the tree node </p><p>Also note that <ul><li>you can freely add tag objects and strings </li><li>for attributes that have the same name as a Python keyword, such as <tt>type</tt> or <tt>class</tt>, you must capitalize the attribute name to avoid syntax errors </li></ul></p><p>The attribute &quot;action&quot; for the form is <tt>check_login</tt>. Again, this means that the function <font color="#333388" size="2"><b>check_login()</b></font> in <font color="#106010" face="courier">index.py</font> will be run </p><p>Unlike <font color="#333388" size="2"><b>index()</b></font> and <font color="#333388" size="2"><b>login()</b></font>, this function will take arguments : the submitted login and password. The arguments must be called like the names used in the input fields of the form : <tt>login</tt> and <tt>passwd</tt>. For the moment we&#x27;ll use a very simple test to see if the user is allowed to log in </p><pre class="prettyprint">def check_login(login,passwd):
+    if login==&quot;john&quot; and passwd==&quot;doe&quot;:
+        Session()[&quot;user&quot;] = login
+        return &quot;logged in&quot;
+    else:
+        return &quot;try again&quot;</pre><p>Inside this function, if the test succeeds, the attribute user of the session object is set to the user&#x27;s login </p><p>For the moment, all we have is the result of the test. After the test, we should be automatically sent back to the home page. The HTTP protocol provides a redirection feature, and Karrigell implementation is once again very straightforward : a built-in exception called HTTP_REDIRECTION </p><p>Change the function <font color="#333388" size="2"><b>check_login()</b></font> like this : </p><pre class="prettyprint">def check_login(login,passwd):
+    if login==&quot;john&quot; and passwd==&quot;doe&quot;:
+        Session()[&quot;user&quot;] = login
+        raise HTTP_REDIRECTION(&#x27;index&#x27;)
+    else:
+        return &quot;try again&quot;</pre><p>This means that after the function is run, if the user is authenticated, the browser redirects to the specified url, here the one that matches the function <font color="#333388" size="2"><b>index()</b></font> in the script </p><p>We can now change the home page to welcome the authenticated user with his name, and allow him to logout : </p><pre class="prettyprint">def index():
+    body = H1(&quot;My CD collection&quot;)
+    logged = &quot;user&quot; in Session()
+    if logged:
+        body += &#x27;Logged in as %s&#x27; %Session()[&quot;user&quot;]
+        body += BR()+A(&quot;Logout&quot;,href=&quot;logout&quot;)
+    else:
+        body += A(&quot;Login&quot;,href=&quot;login&quot;)
+    body += BR()+&#x27;%s visits&#x27; %counter.nb_visits()
+    return body</pre><p>The <font color="#333388" size="2"><b>logout()</b></font> function will only remove the key <i>user</i> from the session object and redirect to the home page : </p><pre class="prettyprint">def logout():
+    del Session()[&quot;user&quot;]
+    raise HTTP_REDIRECTION(&quot;index&quot;)</pre><h1><a name="Summary"></a>Summary<a href="#Summary" class="section_anchor"></a></h1><p>The programming style used by Karrigell is based on namespace : in the scripts, instead of importing modules or using environment variables, a number of built-in names are available for the most common tasks. So far we have covered  </p><ul><li>the names for the HTML tags </li><li>session management with the built-in name <font color="#333388" size="2"><b>Session()</b></font> </li><li>HTTP redirection with the built-in exception HTTP_REDIRECTION </li></ul><p>This makes programming with Karrigell extremely straightforward, thus easy to code and to maintain </p><p>In the next section we will write the code to manage the CD database </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

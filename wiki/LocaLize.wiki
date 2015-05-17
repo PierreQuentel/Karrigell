@@ -1,0 +1,57 @@
+#summary Localisation of scripts (displaying output in different languages)
+#sidebar TableOfContents
+
+Localizing a script means that text can be displayed in different languages, without having to write a script per language
+
+The standard way to do this in Karrigell is to use the script <font color="#106010" face="courier">translation.py</font>, provided in folder <font color="#106010" face="courier">www</font>. In a script where you have strings to translate, begin with
+
+{{{
+_ = Import('translation.py').translate
+}}}
+
+This will make function <font color="#336633"><b>`_`()</b></font> available in the namespace of your script
+
+If your script has a line such as
+{{{
+content = _("myString")
+}}}
+
+it will be translated if the translations file has a translation for _myString_ in one the languages found in the browsers language preferences (the browser sends it as the "Accept-language" header)
+
+The translations file is a configuration file, under the format supported by the <font color="#336633"><b>configparser</b></font> module. Its format is very simple :
+<pre>
+  `[`myString]
+  fr=Ceci est une chaîne à traduire
+  default=This is a string to translate
+</pre>
+
+The translation script finds that the configuration file has a section  `[myString]` ; if the user has defined French as one of the languages in the browsers preference, it returns the translation in French, identified by the option `fr` in the section. If there is no translation for the browsers language, then the `default` option is returned (if no default is specified, the string is returned unchanged)
+
+As of r524 the translation script has been enhanced to allow a default language to be specified in the configuration file. For example, a configuration file containing this text would set _en_ as the default language. If there is no translation for the browser language then the definition for _en_ is used:
+
+<pre>
+  `[`__default__]
+  default_language=en
+  
+  `[`myString]
+  fr=Ceci est une chaîne à traduire
+  en=This is a string to translate
+</pre>
+
+
+== Path and encoding of translation file ==
+By default, the translation file is <font color="#106010" face="courier">translation.ini</font>, in the same folder as <font color="#106010" face="courier">translation.py</font>, and it is supposed to be encoded in iso-8859-1
+
+You can choose to use another translation file with another encoding by using the module-level function 
+
+===use(_path,encoding_)===
+
+  where _path_ is the path of the translation file in the file system. _encoding_ defaults to iso-8859-1
+
+For instance :
+
+{{{
+translation = Import("translation.py")
+translation.use("foo.ini",encoding="utf-8")
+_ = translation.translate
+}}}

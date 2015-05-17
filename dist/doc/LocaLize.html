@@ -1,0 +1,108 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>LocaLize</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Localizing a script means that text can be displayed in different languages, without having to write a script per language </p><p>The standard way to do this in Karrigell is to use the script <font color="#106010" face="courier">translation.py</font>, provided in folder <font color="#106010" face="courier">www</font>. In a script where you have strings to translate, begin with </p><pre class="prettyprint">_ = Import(&#x27;translation.py&#x27;).translate</pre><p>This will make function <font color="#336633"><b><tt>_</tt>()</b></font> available in the namespace of your script </p><p>If your script has a line such as </p><pre class="prettyprint">content = _(&quot;myString&quot;)</pre><p>it will be translated if the translations file has a translation for <i>myString</i> in one the languages found in the browsers language preferences (the browser sends it as the &quot;Accept-language&quot; header) </p><p>The translations file is a configuration file, under the format supported by the <font color="#336633"><b>configparser</b></font> module. Its format is very simple : <pre>   [myString]
+   fr=Ceci est une chaîne à traduire
+   default=This is a string to translate
+ </pre> </p><p>The translation script finds that the configuration file has a section  <tt>[myString]</tt> ; if the user has defined French as one of the languages in the browsers preference, it returns the translation in French, identified by the option <tt>fr</tt> in the section. If there is no translation for the browsers language, then the <tt>default</tt> option is returned (if no default is specified, the string is returned unchanged) </p><h2><a name="Path_and_encoding_of_translation_file"></a>Path and encoding of translation file<a href="#Path_and_encoding_of_translation_file" class="section_anchor"></a></h2><p>By default, the translation file is <font color="#106010" face="courier">translation.ini</font>, in the same folder as <font color="#106010" face="courier">translation.py</font>, and it is supposed to be encoded in iso-8859-1 </p><p>You can choose to use another translation file with another encoding by using the module-level function  </p><h3><a name="use(_path,encoding_)"></a>use(<i>path,encoding</i>)<a href="#use(_path,encoding_)" class="section_anchor"></a></h3><blockquote>where <i>path</i> is the path of the translation file in the file system. <i>encoding</i> defaults to iso-8859-1 
+</blockquote><p>For instance : </p><pre class="prettyprint">translation = Import(&quot;translation.py&quot;)
+translation.use(&quot;foo.ini&quot;,encoding=&quot;utf-8&quot;)
+_ = translation.translate</pre>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

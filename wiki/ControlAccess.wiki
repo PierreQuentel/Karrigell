@@ -1,0 +1,55 @@
+#summary Use an application filter to control access to files/directories
+#sidebar TableOfContents
+
+= Introduction =
+
+App filters are defined as methods of application classes, in <font color="#106010" face="courier">server.py</font> or the equivalent Karrigell start up script. The application class has an attribute "filters", the list of filter functions to call one after the other for each request
+
+Each filter accepts the Karrigell handler object as parameter. This object holds the request information : path info, cookies, request handlers, etc
+
+A filter returns <font color="#333388"><b>None</b></font> is there is nothing special to do ; control is passed to the next filter in the list
+
+If an HTTP error response should be sent (for instance the 403 error, Forbidenn Access), the filter raises HTTP_ERROR(err_code) ; if an HTTP redirection is required to another script, the filter function raises HTTP_REDIRECTION(new_url). Finally, if the function returns a value other than <font color="#333388"><b>None</b></font>, it is the physical path to the resource
+
+Effectively this means you can intercept the URL and change the way it is handled by Karrigell
+
+= Hide access to files with specified extensions =
+
+This script forbids access to files with the extension sqlite :
+
+{{{
+import Karrigell
+
+class App(Karrigell.App):
+
+    hidden = ['.sqlite']
+
+    def hide_ext(self,handler):
+        for ext in self.hidden:
+            if handler.path_info.endswith(ext):
+                raise Karrigell.HTTP_ERROR(403)
+
+    filters = [hide_ext]
+
+Karrigell.run(apps=[App])
+}}}
+
+= Restrict access to directories to site administrator =
+
+{{{
+import Karrigell
+
+class App(Karrigell.App):
+
+    protected_path = ['foo']
+
+    def control_access(self,handler):
+        path = handler.path_info.split('/')
+        if path[1] in self.protected_path and handler.role() != 'admin':
+            raise Karrigell.HTTP_ERROR(403)
+
+    filters = [control_access]
+
+Karrigell.run(apps=[App])
+
+}}}

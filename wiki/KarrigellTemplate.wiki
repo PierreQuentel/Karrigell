@@ -1,0 +1,158 @@
+#summary KT - Karrigell Templates
+#sidebar TableOfContents
+
+=KT - Karrigell Templates=
+<wiki:toc max_depth="3" />
+
+==Introduction==
+KT is a simple template engine intended for use with Karrigell scripts. The goals of KT are to:
+  * Provide a simple templating system with no programatic controls (logic and loops etc to be handled in the calling Python script)
+  * Support the Karrigell translation system
+  * Support variable substitutions
+  * Support the inclusion of other templates
+
+The general recommendation for using KT is to use templates to define the framework of the HTML pages. Where HTML needs to be created programatically, use HTMLTags (see WriteHtml) within the Python scripts to build blocks of HTML code. The resulting HTMLTags object can be passed to the KT render method for substitution in the template.
+
+==KT template language syntax==
+
+KT templates are saved as text files with a `.kt` extension. The language uses the following tags, which are intermingled with other text, typically HTML.
+
+===Inclusion Tag===
+  * `@[template_url]`
+Include the template specified by template_url. URLs are processed in the same way they are processed in the `Import()` function (see ImportModule.) Relative paths are supported, and are relative to the parent template. Inclusions are processed recursively, so child templates can include other templates.
+
+===Substitution Tag===
+  * `$identifier`
+  * `$object.attribute`
+  * `$dictionary.key`
+Substitute an identifier with its value. Indentifiers can be either simple variable names, or can be objects or dictionaries. If dictionaries are used, the key must have the form of a valid python identifier.
+
+===Translation Tag===
+  * `_[string to translate]`
+Translate the string using the standard Karrigell translation system (see LocaLize.) This is the equivalent of the `_()` function in python scripts.
+
+===Combining Tags===
+  * `@[$identifier]`
+  * `_[$identifier]`
+Inclusions can be controlled from the calling script by setting the value of identifier to a template URL. The $object.attribute and $dictionary.key styles can also be used. This gives a great deal of flexibility in how templates are included. For example, a master template can hold the basic design of a page, then different child templates included in it under the control of the calling script. If a $identifier is not defined, or is a False value, then no inclusion is performed. This allows an inclusion to be "turned-off" by the calling script.
+
+While `$identifiers` can be placed within translation tags, it is not recommended. It is better to perform translations in the calling script using the `_()` function.
+
+==Calling KT from within a script==
+
+===Initialisation of the KT object===
+The `KT` object is initialised by calling the built-in KT factory function. The simplest case is:
+{{{
+kt = KT()
+}}}
+Parameters can be passed to KT to set the translate function and the default encoding:
+{{{
+ENCODING = 'utf-8'
+_ = Import('translations.py').translate
+kt = KT(translate=_, encoding=ENCODING)
+}}}
+
+===Rendering templates===
+The `KT` object has one method called `render`. The template to render is passed as the first argument. Values to be included in templates are passed to the script as named arguments:
+{{{
+   result = kt(template_url, var1=var1, var2=var2, data=dict, row=row, this=THIS, ...) 
+}}}
+The template URL points to the KT template file. KT uses the same rules as the Karrigell Import function uses to locate Python scripts.
+
+The `**dict` syntax is also supported:
+{{{
+   print kt(template_url, **dict)
+}}}
+For convenience, the Python built-in `locals()` function can be assigned to a named argument, making locals available in the template:
+{{{
+   print kt(template_url, data=locals())
+}}}
+
+===Encoding management===
+By default KT uses an encoding of UTF-8. This can be overridden when the KT object is instantiated:
+{{{
+kt = KT(encoding='utf-8')
+}}}
+If a specific template is encoded with another encoding, you can specify it with :
+{{{
+text = kt.render(template_file, encoding=foo)
+}}}
+All the included urls in this template are also supposed to be encoded with this encoding. If some of them are encoded with a different encoding their encoding must be specified after the included template file name :
+{{{
+@[included_templ,encoding]
+}}}
+
+==Processing==
+
+Templates are processed as follows:
+  # All inclusions are processed recursively, building up a consolidated template. `$identifiers` in `@[]` tags are expanded first. If the `$identifier` is not defined or is a `False` value, no inclusion is performed and no error is raised. This allows the calling script to "turn off" an inclusion. Circular references are checked and a `RecursionError` is raised if a template tries to include itself, or a child template tries to include its parent.
+  # All other substitutions are performed on the consolidated template.
+  # Translations are performed.
+
+==Example==
+
+This is an example of a KT template, called <font color="#106010" face="courier">template/master.kt</font>:
+{{{
+<html>
+<head>
+<link rel="stylesheet" href="$this.baseurl/css/my.css">
+<title>MyApp $data.title</title>
+</head>
+<body>
+@[$data.bodytmpl]
+<hr>
+<i>_[Powered by Karrigell]</i>
+<p />
+</body>
+</html>
+}}}
+Note how THIS is passed to KT and used to help define URLs to CSS style sheets and the like.
+
+The tag `@[$data.bodytmpl]` includes another template, the name of which is held by the identifier `$data.bodytmpl`. In this example, we will set the value of `$data.bodytmpl` to `index.kt`. Note that the path to <font color="#106010" face="courier">index.kt</font> is relative to the parent template, <font color="#106010" face="courier">template/master.kt</font>. This means that <font color="#106010" face="courier">index.kt</font> must be physically located in the <font color="#106010" face="courier">template</font> directory. 
+
+<font color="#106010" face="courier">template/index.kt</font> contains this code:
+{{{
+<h1>Welcome to $data.who home page!<h1>
+}}}
+This code snippet shows how the template would be called from within a script called <font color="#106010" face="courier">myapp.py</font>:
+{{{
+ENCODING = 'utf-8'
+_ = Import('translations.py').translate
+kt = KT(translate=_, encoding=ENCODING)
+
+def index():
+    title = ' -  home'
+    who = 'my'
+    bodytmpl = 'index.kt'
+    return kt.render('template/master.kt', data=locals(), this=THIS)
+}}}
+If the reader's browser was set to English, calling _/myapp.py/index_ would produce this html:
+{{{
+<html>
+<head>
+<link rel="stylesheet" href="/css/my.css">
+<title>MyApp - home</title>
+</head>
+<body>
+<h1>Welcome to my home page!</h1>
+<hr>
+<i>Powered by Karrigell</i>
+<p />
+</body>
+</html>
+}}}
+If the browser's default language is set to French, and the translation is defined in the Karrigell admin tool, the result would be:
+{{{
+<html>
+<head>
+<link rel="stylesheet" href="/css/my.css">
+<title>MyApp - home</title>
+</head>
+<body>
+<h1>Welcome to my home page!</h1>
+<hr>
+<i>Propulsé par Karrigell</i>
+<p />
+</body>
+</html>
+}}}

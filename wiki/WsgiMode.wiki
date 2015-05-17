@@ -1,0 +1,18 @@
+#summary Explains how to run Karrigell behind the Apache web server
+#sidebar TableOfContents
+
+[http://wsgi.org/wsgi/ WSGI] is the Web Server Gateway Interface. It is a specification for web servers and application servers to communicate with web applications. It is a Python standard, described in detail in PEP 333
+
+To run Karrigell with WSGI behing Apache, download the appropriate Apache module for Python 3.x on WSGI [http://code.google.com/p/modwsgi/downloads/list downloads page] and save it in the modules directory under the name <font color="#106010" face="courier">mod_wsgi-py3.so</font>
+
+The edit the Apache configuration file (httpd.conf):
+
+- in section "# Dynamic Shared Object (DSO) Support", add the line 
+
+{{{LoadModule wsgi_module modules/mod_wsgi-py3.so}}}
+
+- after the line `DocumentRoot`, add this line : 
+
+{{{WSGIScriptAlias / "C:/Karrigell-Python3/cgi-test/wsgi/Karrigell-wsgi.py"}}} 
+
+(replace by the actual path to <font color="#106010" face="courier">Karrigell-wsgi.py</font>. It is located in the directory <font color="#106010" face="courier">wsgi</font> of the Karrigell distribution)

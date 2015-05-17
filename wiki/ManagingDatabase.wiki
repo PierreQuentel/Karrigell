@@ -1,0 +1,198 @@
+#summary Tutorial : database management
+#sidebar TableOfContents
+
+<wiki:toc max_depth="3" />
+
+= Database engine =
+
+Karrigell can use any database engine (MySQL, SQLite, etc) using the appropriate module. For this example we will use a very simple module that stores the data we need : for each CD in the collection, the artist name and the title of the album
+
+Copy this in a module called <font color="#106010" face="courier">simpledb.py</font> :
+{{{
+def read(filename):
+    records = []
+    try:
+        for line in open(filename):
+            records.append(line.strip().split("#"))
+    except IOError:
+        pass
+    return records
+
+def save(records,filename):
+    out = open(filename,'w')
+    for items in records:
+        out.write('#'.join(items)+'\n')
+    out.close()
+}}}
+When you import the module in a script you simply use its functions <font color="#333388" size="2"><b>read()</b></font> and <font color="#333388" size="2"><b>save()</b></font>. The information is stored in a list of tuples
+
+For our CD collection application, the information will consist in only 2 values : the artist name and the CD title
+
+= Home page with the CD list =
+
+We can now modify the <font color="#333388" size="2"><b>index()</b></font> function to print the list of CDs:
+{{{
+counter = Import('counter.py')
+simpledb = Import('simpledb.py')
+
+def index():
+    body = H1("My CD collection")
+    logged = "user" in Session()
+    if logged:
+        body += 'Logged in as %s' %Session()["user"]
+        body += BR()+A("Logout",href="logout")
+    else:
+        body += A("Login",href="login")
+    body += P()
+    # table with all CDs
+    cds = simpledb.read('mycds.db')
+    if cds:
+        table = TABLE()
+        table <= TR(TH("Artist")+TH("Title"))
+        for (artist,title) in cds:
+            table <= TR(TD(artist)+TD(title))
+        body += table
+    else:
+        body += "No CD in the collection"        
+
+    # prompt logged in users to enter a new record
+    if logged:
+        body += P()+A("Enter new CD",href="new_cd")
+    
+    body += P()+'%s visits' %counter.nb_visits()
+    return body
+}}}
+Notice that simpledb is imported at the module level, not inside the function <font color="#333388" size="2"><b>index()</b></font> : the names defined at module level are available in the functions, exactly like in ordinary Python scripts
+
+= Adding new CDs =
+
+For logged-in users there is a link to enter new CDs in the database. The href attribute of this link is new_cd, so we must write a function <font color="#333388" size="2"><b>new_cd()</b></font>
+
+This function will print a form to enter the CD artist and title, and submit the data to another function which will actually write the information in the database, then return to the home page
+
+At this stage you shouldn't have problems to understand the code below :
+{{{
+def new_cd():
+    body = H1('New CD')
+    form = FORM(action="insert_new_cd",method="post")
+    form <= 'Artist '+INPUT(name="artist")
+    form <= 'Title '+INPUT(name="title")
+    form <= INPUT(Type="submit",value="Ok")
+    body += form
+    return body
+
+def insert_new_cd(artist,title):
+    cds = simpledb.read('mycds.db')
+    cds.append((artist,title))
+    simpledb.save(cds,'mycds.db')
+    raise HTTP_REDIRECTION("index")
+}}}
+Add these functions to <font color="#106010" face="courier">index.py</font> and enter a couple of CDs in the database. Each time you are back to the home page you should see the collection growing
+
+= Editing records =
+
+Logged-in users should be able to edit the information about a CD : on the list they should see a link "Edit" sending them to a page where the information will be available for editing
+
+This requires that the information about the CD is carried from the home page to the edition page. For this we could append the information about the CD (artist + title) to the link, for instance : href = edit?artist=Beatles&title=Revolver ; but database engines usually provide record identifiers, that is, integers which identify the record
+
+In our simple database we can use the index of the item in the list as identifier, so that we can rewrite the code to print the CD collection this way :
+{{{
+    # table with all CDs
+    cds = simpledb.read('mycds.db')
+    if cds:
+        table = TABLE()
+        table <= TR(TH("Artist")+TH("Title"))
+        for i,(artist,title) in enumerate(cds):
+            row = TR(TD(artist)+TD(title))
+            if logged:
+                row <= TD(A("Edit",href="edit?rowid=%s" %i))
+            table <= row
+        body += table
+    else:
+        body += "No CD in the collection"        
+}}}
+The function <font color="#333388" size="2"><b>edit()</b></font> will receive one argument called num. All arguments passed to functions in Karrigell Services are strings, so before using this argument num as the index in a list don't forget to convert it to an integer
+{{{
+def edit(rowid):
+    cds = simpledb.read('mycds.db')
+    artist,title = cds[int(rowid)]
+    body = H1('Edit CD')
+    form = FORM(action="update_cd",method="post")
+    form <= INPUT(name="rowid",Type="hidden",value=rowid)
+    form <= 'Artist '+INPUT(name="artist",value=artist)+BR()
+    form <= 'Title '+INPUT(name="title",value=title)
+    form <= INPUT(Type="submit",value="Ok")
+    body += form
+    return body
+
+def update_cd(rowid,artist,title):
+    cds = simpledb.read('mycds.db')
+    cds[int(rowid)] = (artist,title)
+    simpledb.save(cds,'mycds.db')
+    raise HTTP_REDIRECTION("index")
+}}}
+
+= Removing records =
+
+The final step is to enable deletion of CDs from the base : once again, edit the function <font color="#333388" size="2"><b>index()</b></font> like this
+{{{
+    # table with all CDs
+    cds = simpledb.read('mycds.db')
+    if cds:
+        table = TABLE()
+        table <= TR(TH("Artist")+TH("Title"))
+        for i,(artist,title) in enumerate(cds):
+            row = TR(TD(artist)+TD(title))
+            if logged:
+                row <= TD(A("Edit",href="edit?rowid=%s" %i))
+                row <= TD(A("Delete",href="remove?rowid=%s" %i))
+            table <= row
+        body += table
+    else:
+        body += "No CD in the collection"        
+}}}
+and add a new function, <font color="#333388" size="2"><b>remove()</b></font>:
+{{{
+def remove(rowid):
+    cds = simpledb.read('mycds.db')
+    del cds[int(rowid)]
+    simpledb.save(cds,'mycds.db')
+    raise HTTP_REDIRECTION("index")
+}}}
+= Summary =
+
+We now have a complete application to manage our CD collection. The structure of the application in the script <font color="#106010" face="courier">index.py</font> is as clear as in any Python module :
+{{{
+counter = Import('counter.py')
+simpledb = Import('simpledb.py')
+
+def index():
+    ...
+    # login / logout
+    ...
+    # print existing records
+    ...
+    # prompt logged in users to edit/remove/add records
+    ...
+    # page counter
+    ...
+def login():
+    ...
+def check_login(login,passwd):
+    ...
+def logout():
+    ...
+def new_cd():
+    ...
+def insert_new_cd(artist,title):
+    ...
+def edit(rowid):
+    ...
+def update_cd(rowid,artist,title):
+    ...
+def remove(rowid):
+    ...
+}}}
+Each function matches a page of the application. For the pages that receive user input, the fields are the arguments to the function (always as strings)
+
+Throughout this short presentation you see that all you need to know is Python and HTML. The package doesn't require any configuration, and for programmers Karrigell only provides a small set of additional built-in names

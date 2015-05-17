@@ -1,0 +1,125 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>ScriptsNamespace</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Karrigell scripts are Python scripts, run in a namespace prepared by the framework </p><p><ul><li><a href="#Request_information">Request information</a></li><ul><ul><li><a href="#REQUEST_HEADERS">REQUEST_HEADERS</a></li><li><a href="#COOKIE">COOKIE</a></li><li><a href="#ACCEPTED_LANGUAGES">ACCEPTED_LANGUAGES</a></li></ul></ul><li><a href="#Script_information">Script information</a></li><ul><ul><li><a href="#THIS">THIS</a></li></ul></ul><li><a href="#Values_set_in_the_script">Values set in the script</a></li><ul><ul><li><a href="#SET_COOKIE">SET_COOKIE</a></li><li><a href="#RESPONSE_HEADERS">RESPONSE_HEADERS</a></li><li><a href="#ENCODING">ENCODING</a></li></ul></ul><li><a href="#Functions">Functions</a></li><ul><ul><li><a href="#KT()">KT()</a></li><li><a href="#Session()">Session()</a></li><li><a href="#Import()">Import()</a></li><li><a href="#Login(),_Logout(),_User()">Login(), Logout(), User()</a></li></ul></ul><li><a href="#Exceptions">Exceptions</a></li><ul><ul><li><a href="#HTTP_REDIRECTION(_url_)">HTTP_REDIRECTION( url )</a></li><li><a href="#HTTP_ERROR(_code_[_,message_]_)">HTTP_ERROR( code [ ,message ] )</a></li></ul></ul></ul> </p><h1><a name="Request_information"></a>Request information<a href="#Request_information" class="section_anchor"></a></h1><p>The script receives information from the request sent by the user. This includes the request headers, including cookies, and the data passed in the query string or in the request body (for POST requests) </p><h3><a name="REQUEST_HEADERS"></a>REQUEST_HEADERS<a href="#REQUEST_HEADERS" class="section_anchor"></a></h3><blockquote>A dictionary-like object with keys and values matching the headers sent by the user. For convenience, two headers are provided with special names : cookies and accepted languages 
+</blockquote><h3><a name="COOKIE"></a>COOKIE<a href="#COOKIE" class="section_anchor"></a></h3><blockquote>An instance of <font color="#333388" size="2"><b><tt>http.cookies.SimpleCookie</tt></b></font>, where keys are the cookie names and values are the value associated with this name 
+</blockquote><h3><a name="ACCEPTED_LANGUAGES"></a>ACCEPTED_LANGUAGES<a href="#ACCEPTED_LANGUAGES" class="section_anchor"></a></h3><blockquote>The value associated with the &quot;accept-language&quot; tag 
+</blockquote><p>The data passed in the query string or request body is passed as arguments to the functions managing the request : this is described in <a href="PassingParameters.html">PassingParameters</a> </p><h1><a name="Script_information"></a>Script information<a href="#Script_information" class="section_anchor"></a></h1><h3><a name="THIS"></a>THIS<a href="#THIS" class="section_anchor"></a></h3><blockquote>The instance of <font color="#333388" size="2"><b><tt>Karrigell.RequestHandler</tt></b></font> representing the request. It provides useful attributes and methods : 
+</blockquote><h4><a name="THIS.client_address"></a>THIS.client_address<a href="#THIS.client_address" class="section_anchor"></a></h4><blockquote>A 2-element tuple with the client IP address and port 
+</blockquote><h4><a name="THIS.path_info"></a>THIS.path_info<a href="#THIS.path_info" class="section_anchor"></a></h4><blockquote>Same as the CGI PATH_INFO value : the url of script, stripped of the query string, if any 
+</blockquote><h4><a name="THIS.script_path"></a>THIS.script_path<a href="#THIS.script_path" class="section_anchor"></a></h4><blockquote>The path of the script in the file system 
+</blockquote><h4><a name="THIS.abs_path(_*_rel_path)"></a>THIS.abs_path(<tt>*</tt>rel_path)<a href="#THIS.abs_path(_*_rel_path)" class="section_anchor"></a></h4><blockquote>Transforms a relative path in the file system into an absolute path, based on the script directory 
+</blockquote><h4><a name="THIS.abs_url(_*_rel_url)"></a>THIS.abs_url(<tt>*</tt>rel_url)<a href="#THIS.abs_url(_*_rel_url)" class="section_anchor"></a></h4><blockquote>Transforms a relative url into an absolute url, based on the script url 
+</blockquote><h1><a name="Values_set_in_the_script"></a>Values set in the script<a href="#Values_set_in_the_script" class="section_anchor"></a></h1><h3><a name="SET_COOKIE"></a>SET_COOKIE<a href="#SET_COOKIE" class="section_anchor"></a></h3><blockquote>An instance of <font color="#338" size="2"><b><tt>http.cookies.SimpleCookie</tt></b></font> used to set the cookies to return to the user 
+</blockquote><h3><a name="RESPONSE_HEADERS"></a>RESPONSE_HEADERS<a href="#RESPONSE_HEADERS" class="section_anchor"></a></h3><blockquote>An instance of <font color="#338" size="2"><b><tt>email.message.Message()</tt></b></font> used to set response headers 
+</blockquote><blockquote>It is initialized with the content-type header set to &quot;text/html&quot;. If you want to change it, you must replace it with the syntax  
+</blockquote><pre class="prettyprint"> RESPONSE_HEADERS.replace_header(&#x27;Content-type&#x27;,value)</pre><h3><a name="ENCODING"></a>ENCODING<a href="#ENCODING" class="section_anchor"></a></h3><blockquote>The encoding that the browser will use to print strings and to encode form data. Defaults to <font color="#333388" size="2"><b>sys.getdefaultencoding()</b></font> 
+</blockquote><h1><a name="Functions"></a>Functions<a href="#Functions" class="section_anchor"></a></h1><h3><a name="KT()"></a>KT()<a href="#KT()" class="section_anchor"></a></h3><blockquote>Returns an instance of the <a href="KarrigellTemplate.html">Templating system</a> 
+</blockquote><h3><a name="Session()"></a>Session()<a href="#Session()" class="section_anchor"></a></h3><blockquote>Returns the session object. It is a Python object that is identified by a cookie called session_id. A script can set attributes to this object and retrieve this information in other pages by another call to <font color="#333388" size="2"><b>Session()</b></font> 
+</blockquote><blockquote>By default, the framework stores this object in a file whose name is the session_id value. Only Python built-in objects can be set as attributes (not instances of user-defined classes). See <a href="SessionManagement.html">SessionManagement</a> for more information 
+</blockquote><h3><a name="Import()"></a>Import()<a href="#Import()" class="section_anchor"></a></h3><blockquote>For modules in the Python distribution, or installed in the site-package folder, you can safely use the built-in statement &quot;import&quot;. But for user-defined modules, this is not possible because of the way the import statement works : it is not reliable in a multi-user, multi-threaded environment 
+</blockquote><blockquote>The function <font color="#333388" size="2"><b>Import(<i>url</i>)</b></font> finds the Python module identified by the url (if it is a relative url, it is resolved relatively to the script url), runs it in the script namespace, and returns an object representing the imported module 
+</blockquote><blockquote>The equivalent of the built-in &quot;import foo&quot; is : 
+</blockquote><pre class="prettyprint"> foo = Import(&#x27;foo.py&#x27;)</pre><blockquote>Since the imported script is run in the &quot;importing&quot; script namespace, it means that all the values and functions of this namespace can be used in the imported script 
+</blockquote><h3><a name="Login(),_Logout(),_User()"></a>Login(), Logout(), User()<a href="#Login(),_Logout(),_User()" class="section_anchor"></a></h3><blockquote>Functions used by the built-in <a href="UserManagement.html">UserManagement</a> user management system 
+</blockquote><h1><a name="Exceptions"></a>Exceptions<a href="#Exceptions" class="section_anchor"></a></h1><h3><a name="HTTP_REDIRECTION(_url_)"></a>HTTP_REDIRECTION(<i>url</i>)<a href="#HTTP_REDIRECTION(_url_)" class="section_anchor"></a></h3><blockquote>Raising this exception in a script results in an HTTP redirection (code 302) to the specified url 
+</blockquote><h3><a name="HTTP_ERROR(_code_[_,message_]_)"></a>HTTP_ERROR(<i>code<tt>[</tt>,message<tt>]</tt></i>)<a href="#HTTP_ERROR(_code_[_,message_]_)" class="section_anchor"></a></h3><blockquote>Raising this exception sends the HTTP error code and message to the user. If no message is specified, the default message for this error code is used 
+</blockquote>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

@@ -1,0 +1,42 @@
+#summary The built-in user management system
+#sidebar TableOfContents
+
+Karrigell provides a set of functions to manage application users and their rights. They rely on a users database and use a script to manage users login and logout
+
+Different roles can be set to users, to specify different access right to scripts or files. The levels can be "admin", "edit" or "visit". Usually, an administrator has all read and write access to all folders, files and scripts ; editors can read and modify some pages ; visitors can only see a set of pages
+
+= Users database =
+
+An application defines its user database by the attribute <font color="#338" size="2"><b>users_db</b></font> (see ApplicationSettings)
+
+It is an instance of a database management class. The module <font color="#336633"><b>admin_db</b></font> provides one such class : SQLiteUsersDb. This class stores user information in a SQLite database. It is initialized with one argument : the path of the database in the file system
+
+= Login script =
+
+An application defines a script that will be used to ask a user his login and password, and that will check that they match a user in the database
+
+The url of this script is specified with the application attribute login`_`url. It defaults to _(root`_`url)/admin/login.py/login_, that is, the function <font color="#338" size="2"><b>login()</b></font> in the script <font color="#106010" face="courier">login.py</font> in folder <font color="#106010" face="courier">www/admin</font> of the Karrigell distribution
+
+The login script can be customized, but the arguments of the <font color="#338" size="2"><b>login()</b></font> function must remain the same as in this default script :
+  * _role_ : the requested role
+  * _origin_ : the url of the script where the <font color="#338" size="2"><b>Login()</b></font> function was called. It is used to redirect the user to this original script if the login was successful
+
+= Functions =
+
+The functions available in scripts to manage users are :
+
+==Login(_`[`role`[`,login`_`url`[,origin]]]`_)==
+ When the framework runs this function, it checks that if the user is already authenticated and has the required role (admin, edit or visit). If a user has the admin role, he also has the edit and visit role ; if it has the edit role, he also has the visit role
+
+ If the user is not authenticated, or does not have the required role, a redirection to the specified login`_`url described above is performed
+
+ _role_ defaults to "admin". _login`_`url_ defaults to the url of the login script defined above
+
+ After a successful authentication, the user is redirected to the url specified in _origin_. If not specified, the redirection leads to the page where the Login() function was called
+
+==Logout(_`[`redir`_`to`]`_)==
+ When this function is run, the cookies used to store information about a logged in user are erased, so that he is no longer authenticated
+ The optional _redir`_`to_ argument indicated the url where the user should be redirected after this logout operation was performed. It defaults to the url of the script where the <font color="#338" size="2"><b>Logout()</b></font> function was run
+
+==User()==
+ This function returns an object with the attributes _login_ and _role_, matching user login and role (admin, edit or visit), or <font color="#333388"><b>None</b></font> if no user is authenticated

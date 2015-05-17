@@ -1,0 +1,229 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>ManagingDatabase</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p><ul><li><a href="#Database_engine">Database engine</a></li><li><a href="#Home_page_with_the_CD_list">Home page with the CD list</a></li><li><a href="#Adding_new_CDs">Adding new CDs</a></li><li><a href="#Editing_records">Editing records</a></li><li><a href="#Removing_records">Removing records</a></li><li><a href="#Summary">Summary</a></li></ul> </p><h1><a name="Database_engine"></a>Database engine<a href="#Database_engine" class="section_anchor"></a></h1><p>Karrigell can use any database engine (MySQL, SQLite, etc) using the appropriate module. For this example we will use a very simple module that stores the data we need : for each CD in the collection, the artist name and the title of the album </p><p>Copy this in a module called <font color="#106010" face="courier">simpledb.py</font> : </p><pre class="prettyprint">def read(filename):
+    records = []
+    try:
+        for line in open(filename):
+            records.append(line.strip().split(&quot;#&quot;))
+    except IOError:
+        pass
+    return records
+
+def save(records,filename):
+    out = open(filename,&#x27;w&#x27;)
+    for items in records:
+        out.write(&#x27;#&#x27;.join(items)+&#x27;\n&#x27;)
+    out.close()</pre><p>When you import the module in a script you simply use its functions <font color="#333388" size="2"><b>read()</b></font> and <font color="#333388" size="2"><b>save()</b></font>. The information is stored in a list of tuples </p><p>For our CD collection application, the information will consist in only 2 values : the artist name and the CD title </p><h1><a name="Home_page_with_the_CD_list"></a>Home page with the CD list<a href="#Home_page_with_the_CD_list" class="section_anchor"></a></h1><p>We can now modify the <font color="#333388" size="2"><b>index()</b></font> function to print the list of CDs: </p><pre class="prettyprint">counter = Import(&#x27;counter.py&#x27;)
+simpledb = Import(&#x27;simpledb.py&#x27;)
+
+def index():
+    body = H1(&quot;My CD collection&quot;)
+    logged = &quot;user&quot; in Session()
+    if logged:
+        body += &#x27;Logged in as %s&#x27; %Session()[&quot;user&quot;]
+        body += BR()+A(&quot;Logout&quot;,href=&quot;logout&quot;)
+    else:
+        body += A(&quot;Login&quot;,href=&quot;login&quot;)
+    body += P()
+    # table with all CDs
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    if cds:
+        table = TABLE()
+        table &lt;= TR(TH(&quot;Artist&quot;)+TH(&quot;Title&quot;))
+        for (artist,title) in cds:
+            table &lt;= TR(TD(artist)+TD(title))
+        body += table
+    else:
+        body += &quot;No CD in the collection&quot;        
+
+    # prompt logged in users to enter a new record
+    if logged:
+        body += P()+A(&quot;Enter new CD&quot;,href=&quot;new_cd&quot;)
+    
+    body += P()+&#x27;%s visits&#x27; %counter.nb_visits()
+    return body</pre><p>Notice that simpledb is imported at the module level, not inside the function <font color="#333388" size="2"><b>index()</b></font> : the names defined at module level are available in the functions, exactly like in ordinary Python scripts </p><h1><a name="Adding_new_CDs"></a>Adding new CDs<a href="#Adding_new_CDs" class="section_anchor"></a></h1><p>For logged-in users there is a link to enter new CDs in the database. The href attribute of this link is new_cd, so we must write a function <font color="#333388" size="2"><b>new_cd()</b></font> </p><p>This function will print a form to enter the CD artist and title, and submit the data to another function which will actually write the information in the database, then return to the home page </p><p>At this stage you shouldn&#x27;t have problems to understand the code below : </p><pre class="prettyprint">def new_cd():
+    body = H1(&#x27;New CD&#x27;)
+    form = FORM(action=&quot;insert_new_cd&quot;,method=&quot;post&quot;)
+    form &lt;= &#x27;Artist &#x27;+INPUT(name=&quot;artist&quot;)
+    form &lt;= &#x27;Title &#x27;+INPUT(name=&quot;title&quot;)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    body += form
+    return body
+
+def insert_new_cd(artist,title):
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    cds.append((artist,title))
+    simpledb.save(cds,&#x27;mycds.db&#x27;)
+    raise HTTP_REDIRECTION(&quot;index&quot;)</pre><p>Add these functions to <font color="#106010" face="courier">index.py</font> and enter a couple of CDs in the database. Each time you are back to the home page you should see the collection growing </p><h1><a name="Editing_records"></a>Editing records<a href="#Editing_records" class="section_anchor"></a></h1><p>Logged-in users should be able to edit the information about a CD : on the list they should see a link &quot;Edit&quot; sending them to a page where the information will be available for editing </p><p>This requires that the information about the CD is carried from the home page to the edition page. For this we could append the information about the CD (artist + title) to the link, for instance : href = edit?artist=Beatles&amp;title=Revolver ; but database engines usually provide record identifiers, that is, integers which identify the record </p><p>In our simple database we can use the index of the item in the list as identifier, so that we can rewrite the code to print the CD collection this way : </p><pre class="prettyprint">    # table with all CDs
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    if cds:
+        table = TABLE()
+        table &lt;= TR(TH(&quot;Artist&quot;)+TH(&quot;Title&quot;))
+        for i,(artist,title) in enumerate(cds):
+            row = TR(TD(artist)+TD(title))
+            if logged:
+                row &lt;= TD(A(&quot;Edit&quot;,href=&quot;edit?rowid=%s&quot; %i))
+            table &lt;= row
+        body += table
+    else:
+        body += &quot;No CD in the collection&quot;        </pre><p>The function <font color="#333388" size="2"><b>edit()</b></font> will receive one argument called num. All arguments passed to functions in Karrigell Services are strings, so before using this argument num as the index in a list don&#x27;t forget to convert it to an integer </p><pre class="prettyprint">def edit(rowid):
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    artist,title = cds[int(rowid)]
+    body = H1(&#x27;Edit CD&#x27;)
+    form = FORM(action=&quot;update_cd&quot;,method=&quot;post&quot;)
+    form &lt;= INPUT(name=&quot;rowid&quot;,Type=&quot;hidden&quot;,value=rowid)
+    form &lt;= &#x27;Artist &#x27;+INPUT(name=&quot;artist&quot;,value=artist)+BR()
+    form &lt;= &#x27;Title &#x27;+INPUT(name=&quot;title&quot;,value=title)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    body += form
+    return body
+
+def update_cd(rowid,artist,title):
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    cds[int(rowid)] = (artist,title)
+    simpledb.save(cds,&#x27;mycds.db&#x27;)
+    raise HTTP_REDIRECTION(&quot;index&quot;)</pre><h1><a name="Removing_records"></a>Removing records<a href="#Removing_records" class="section_anchor"></a></h1><p>The final step is to enable deletion of CDs from the base : once again, edit the function <font color="#333388" size="2"><b>index()</b></font> like this </p><pre class="prettyprint">    # table with all CDs
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    if cds:
+        table = TABLE()
+        table &lt;= TR(TH(&quot;Artist&quot;)+TH(&quot;Title&quot;))
+        for i,(artist,title) in enumerate(cds):
+            row = TR(TD(artist)+TD(title))
+            if logged:
+                row &lt;= TD(A(&quot;Edit&quot;,href=&quot;edit?rowid=%s&quot; %i))
+                row &lt;= TD(A(&quot;Delete&quot;,href=&quot;remove?rowid=%s&quot; %i))
+            table &lt;= row
+        body += table
+    else:
+        body += &quot;No CD in the collection&quot;        </pre><p>and add a new function, <font color="#333388" size="2"><b>remove()</b></font>: </p><pre class="prettyprint">def remove(rowid):
+    cds = simpledb.read(&#x27;mycds.db&#x27;)
+    del cds[int(rowid)]
+    simpledb.save(cds,&#x27;mycds.db&#x27;)
+    raise HTTP_REDIRECTION(&quot;index&quot;)</pre><h1><a name="Summary"></a>Summary<a href="#Summary" class="section_anchor"></a></h1><p>We now have a complete application to manage our CD collection. The structure of the application in the script <font color="#106010" face="courier">index.py</font> is as clear as in any Python module : </p><pre class="prettyprint">counter = Import(&#x27;counter.py&#x27;)
+simpledb = Import(&#x27;simpledb.py&#x27;)
+
+def index():
+    ...
+    # login / logout
+    ...
+    # print existing records
+    ...
+    # prompt logged in users to edit/remove/add records
+    ...
+    # page counter
+    ...
+def login():
+    ...
+def check_login(login,passwd):
+    ...
+def logout():
+    ...
+def new_cd():
+    ...
+def insert_new_cd(artist,title):
+    ...
+def edit(rowid):
+    ...
+def update_cd(rowid,artist,title):
+    ...
+def remove(rowid):
+    ...</pre><p>Each function matches a page of the application. For the pages that receive user input, the fields are the arguments to the function (always as strings) </p><p>Throughout this short presentation you see that all you need to know is Python and HTML. The package doesn&#x27;t require any configuration, and for programmers Karrigell only provides a small set of additional built-in names </p>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

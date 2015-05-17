@@ -1,0 +1,92 @@
+#summary The namespace where scripts are run
+#sidebar TableOfContents
+
+Karrigell scripts are Python scripts, run in a namespace prepared by the framework
+
+<wiki:toc max_depth="3" />
+
+= Request information =
+
+The script receives information from the request sent by the user. This includes the request headers, including cookies, and the data passed in the query string or in the request body (for POST requests)
+
+===REQUEST_HEADERS===
+ A dictionary-like object with keys and values matching the headers sent by the user. For convenience, two headers are provided with special names : cookies and accepted languages
+
+===COOKIE===
+ An instance of <font color="#333388" size="2"><b>`http.cookies.SimpleCookie`</b></font>, where keys are the cookie names and values are the value associated with this name
+
+===ACCEPTED_LANGUAGES===
+ The value associated with the "accept-language" tag
+
+The data passed in the query string or request body is passed as arguments to the functions managing the request : this is described in PassingParameters
+
+= Script information =
+
+===THIS===
+ The instance of <font color="#333388" size="2"><b>`Karrigell.RequestHandler`</b></font> representing the request. It provides useful attributes and methods :
+
+====THIS.client_address====
+ A 2-element tuple with the client IP address and port
+
+====THIS.path_info====
+ Same as the CGI PATH_INFO value : the url of script, stripped of the query string, if any
+
+====THIS.script_path====
+ The path of the script in the file system
+
+====THIS.abs_path(`*`rel_path)====
+ Transforms a relative path in the file system into an absolute path, based on the script directory
+
+====THIS.abs_url(`*`rel_url)====
+ Transforms a relative url into an absolute url, based on the script url
+
+= Values set in the script =
+
+===SET_COOKIE===
+ An instance of <font color="#338" size="2"><b>`http.cookies.SimpleCookie`</b></font> used to set the cookies to return to the user
+
+===RESPONSE_HEADERS===
+ An instance of <font color="#338" size="2"><b>`email.message.Message()`</b></font> used to set response headers
+
+ It is initialized with the content-type header set to "text/html". If you want to change it, you must replace it with the syntax 
+
+ {{{
+ RESPONSE_HEADERS.replace_header('Content-type',value)
+ }}}
+
+===ENCODING===
+ The encoding that the browser will use to print strings and to encode form data. Defaults to <font color="#333388" size="2"><b>sys.getdefaultencoding()</b></font>
+
+= Functions =
+
+===KT()===
+ Returns an instance of the [KarrigellTemplate Templating system]
+
+===Session()===
+ Returns the session object. It is a Python object that is identified by a cookie called session_id. A script can set attributes to this object and retrieve this information in other pages by another call to <font color="#333388" size="2"><b>Session()</b></font>
+
+ By default, the framework stores this object in a file whose name is the session_id value. Only Python built-in objects can be set as attributes (not instances of user-defined classes). See SessionManagement for more information
+
+===Import()===
+ For modules in the Python distribution, or installed in the site-package folder, you can safely use the built-in statement "import". But for user-defined modules, this is not possible because of the way the import statement works : it is not reliable in a multi-user, multi-threaded environment
+
+ The function <font color="#333388" size="2"><b>Import(_url_)</b></font> finds the Python module identified by the url (if it is a relative url, it is resolved relatively to the script url), runs it in the script namespace, and returns an object representing the imported module
+
+ The equivalent of the built-in "import foo" is :
+
+ {{{
+ foo = Import('foo.py')
+ }}}
+
+ Since the imported script is run in the "importing" script namespace, it means that all the values and functions of this namespace can be used in the imported script
+
+===Login(), Logout(), User()===
+ Functions used by the built-in [UserManagement] user management system
+
+= Exceptions =
+
+===HTTP_REDIRECTION(_url_)===
+ Raising this exception in a script results in an HTTP redirection (code 302) to the specified url
+
+===HTTP_ERROR(_code`[`,message`]`_)===
+ Raising this exception sends the HTTP error code and message to the user. If no message is specified, the default message for this error code is used

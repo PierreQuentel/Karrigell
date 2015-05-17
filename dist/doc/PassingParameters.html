@@ -1,0 +1,141 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>PassingParameters</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>The user enters data in an HTML form. Each field in the form is identified by a name ; the form itself has an argument <i>action</i> to specify the url of the script that will handle the submitted data </p><p>In Karrigell, the <i>action</i> is a function in a script, and the form field names are the arguments of this function </p><h1><a name="Basic_example"></a>Basic example<a href="#Basic_example" class="section_anchor"></a></h1><pre class="prettyprint">def index():
+    # build the HTML form
+    form = FORM(action=&quot;show&quot;)
+    form &lt;= INPUT(name=&quot;foo&quot;)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    return HTML(BODY(form))
+
+def show(foo):
+    return foo</pre><p>In <font color="#338" size="2"><b>index()</b></font> we build the form, with an attribute <i>action</i> set to &quot;show&quot;, the name of the function in the same script that will manage the form </p><p>This function takes a single argument, <i>foo</i>, the same as the name of the only INPUT field in the form. Here it simply returns the submitted data </p><p>In this simple example, the value of the argument is a (unicode) string </p><h2><a name="Arbitrary_arguments"></a>Arbitrary arguments<a href="#Arbitrary_arguments" class="section_anchor"></a></h2><p>Sometimes the form has fields that may or may not be filled by the user, such as check buttons, radiobuttons, options in a SELECT tag, etc </p><p>In this case, the function can use the usual Python syntax for arbitrary argument list, and check if a specific field was actually sent : </p><pre class="prettyprint">def manage(**kw):
+    if &#x27;foo&#x27; in kw:
+        (...)</pre><h2><a name="Multiple_values_for_the_same_field"></a>Multiple values for the same field<a href="#Multiple_values_for_the_same_field" class="section_anchor"></a></h2><p>In some cases the same field can take more than one value : this is the case for instance for SELECT tags with the attribute MULTIPLE set, meaning that the user can select several options </p><p>In this case, Karrigell uses a convention : the name of the field must end with <tt>[]</tt>. The framework will pass the argument to the receiving function <i>as a list of string values</i>, with the same name stripped of the trailing <tt>[]</tt> </p><pre class="prettyprint">def index(**kw):
+    form = FORM(action=&quot;show&quot;)
+    select = SELECT(name=&quot;foo[]&quot;,multiple=True) # field name ends with []
+    select &lt;= OPTION(&quot;black&quot;,value=0)
+    select &lt;= OPTION(&quot;white&quot;,value=1)
+    form &lt;= select
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    return HTML(BODY(form))
+
+def show(foo):
+    return foo</pre><h2><a name="File_uploads"></a>File uploads<a href="#File_uploads" class="section_anchor"></a></h2><p>This script prompts the user to select a file in the file system, then upload it to the server using the POST method and a specific enctype : </p><pre class="prettyprint">def index():
+    form = FORM(action=&quot;upload&quot;,method=&quot;post&quot;,enctype=&quot;multipart/form-data&quot;)
+    form &lt;= INPUT(Type=&quot;file&quot;,name=&quot;src&quot;)
+    form &lt;= INPUT(Type=&quot;submit&quot;,value=&quot;Ok&quot;)
+    return HTML(BODY(form))
+ 
+def upload(src):
+    import mimetypes
+    gtype,encoding = mimetypes.guess_type(src.filename)
+    RESPONSE_HEADERS[&#x27;Content-type&#x27;] = gtype
+    data = src.file.read()
+    return data</pre><p>The <font color="#333388" size="2"><b>upload()</b></font> function receives an object with 2 attributes  <ul><li> <font color="#333388" size="2"><b>file</b></font> : a file-like object. Its methods <font color="#333388" size="2"><b>read()</b></font> and <font color="#333388" size="2"><b>readline()</b></font> return bytes </li><li> <font color="#333388" size="2"><b>filename</b></font> : the name of the file </li></ul></p><p>In the example, the mimetype of the file is guessed using the Python built-in module mimetypes. It is used to set the content type of the returned data. The content of the file is read from the attribute file and sent as the return value of the function </p><p>If the uploaded file was a JPEG image, the image will be displayed in the browser </p><h2><a name="Image_inputs"></a>Image inputs<a href="#Image_inputs" class="section_anchor"></a></h2><p>For input fields with type = &quot;image&quot;, the value sent by the user agent is the position of the mouse when the user clicked the image, relative to the upper left corner </p><p>In Karrigell, the value matching the field name is a Python objet with two attributes, <font color="#338" size="2"><b>x</b></font> and <font color="#338" size="2"><b>y</b></font>, holding these coordinates </p><p>Example : </p><pre class="prettyprint">def index():
+     i = INPUT(type=&quot;image&quot;, name=&quot;img_pos&quot;, src=&quot;../pic.jpg&quot;)
+     f = FORM(i, enctype=&quot;multipart/form-data&quot;, action=&quot;click&quot;,
+        method=&quot;POST&quot;)
+     return HTML(BODY(f))
+
+def click(img_pos):
+     body = &quot;click coordinates %s %s&quot; %(img_pos.x,img_pos.y)
+     return HTML(body)</pre>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

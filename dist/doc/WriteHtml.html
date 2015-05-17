@@ -1,0 +1,134 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>WriteHtml</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p><ul><li><a href="#Introduction">Introduction</a></li><li><a href="#Basics">Basics</a></li><li><a href="#Nesting_tags">Nesting tags</a></li><li><a href="#The_SELECT_tag">The SELECT tag</a></li><ul><ul><li><a href="#from_list(_items,_[_use_content_]_)">from_list( items, [ use_content ] )</a></li><li><a href="#select(_value=v_arg,content=c_arg_)">select( value=v_arg,content=c_arg )</a></li></ul></ul><li><a href="#The_RADIO_and_CHECKBOX_classes">The RADIO and CHECKBOX classes</a></li><ul><ul><li><a href="#RADIO(_items,_[_values,_[**_attrs_]]_)">RADIO( items, [ values, [** attrs ]] )</a></li><li><a href="#check(_value=arg_)_or_check(_content=arg_)">check( value=arg ) or check( content=arg )</a></li></ul></ul><li><a href="#Editing_a_tag">Editing a tag</a></li><li><a href="#Using_HTMLTags_in_Karrigell_scripts">Using HTMLTags in Karrigell scripts</a></li></ul> </p><h1><a name="Introduction"></a>Introduction<a href="#Introduction" class="section_anchor"></a></h1><p>A dynamic web application presents data inside an HTML document. The best way to generate HTML is to use the HTMLTags module </p><h1><a name="Basics"></a>Basics<a href="#Basics" class="section_anchor"></a></h1><p>HTMLTags defines a class for each valid HTML tag (including HTML5), in uppercase letters : for instance, there are classes <tt>HTML, HEAD, BODY, TABLE, B, I</tt>, etc. </p><p>These classes are initiated with a value, and optional keyword arguments : </p><p><pre class="prettyprint">DIV(content,key1=value1,key2=value2...)</pre> </p><p>The <tt>__str()__</tt> method of these classes returns the HTML code matching the tag name and arguments. For HTML attributes without arguments, such as the MULTIPLE argument of SELECT tags, the constructor must be called with the value True : </p><p><pre class="prettyprint">SELECT(name=&quot;foo&quot;,multiple=True)</pre> </p><h1><a name="Nesting_tags"></a>Nesting tags<a href="#Nesting_tags" class="section_anchor"></a></h1><p>The content argument of a tag can be another instance of an HTMLTags class. For instance : </p><pre class="prettyprint">title = TITLE(&quot;FC Barcelona Home Page&quot;)
+head = HEAD(title)
+print(head)
+&gt;&gt;&gt; &lt;HEAD&gt;&lt;TITLE&gt;FC Barcelona Home Page&lt;/TITLE&gt;&lt;/HEAD&gt;</pre><p>Tags support addition : </p><pre class="prettyprint">line = TD(&quot;email&quot;)+TD(INPUT(name=&quot;email&quot;))
+print(line)
+&gt;&gt;&gt; &lt;TD&gt;email&lt;/TD&gt;&lt;TD&gt;&lt;INPUT name=&quot;email&quot;&gt;&lt;/TD&gt;</pre><p>and multiplication </p><pre class="prettyprint">line = TH(&quot;&amp;nbsp;&quot;)*3
+print(line)
+&gt;&gt;&gt; &lt;TH&gt;&amp;nbsp;&lt;/TH&gt;&lt;TH&gt;&amp;nbsp;&lt;/TH&gt;&lt;TH&gt;&amp;nbsp;&lt;/TH&gt;</pre><p>The operator &lt;= means &quot;add child&quot;, you can use it to build complex HTML documents : </p><pre class="prettyprint">body = BODY()
+body &lt;= H2(&quot;Home page&quot;)
+table = TABLE(Class=&quot;players&quot;)
+table &lt;= TR(TH(&quot;Name&quot;)+TH(&quot;Birth&quot;))
+for name,birth in [(&quot;Andres Iniesta&quot;,&quot;1984-05-11&quot;),
+    (&quot;Lionel Messi&quot;,&quot;1987-06-24&quot;)]:
+    table &lt;= TR(TD(name)+TD(birth))
+body &lt;= table</pre><h1><a name="The_SELECT_tag"></a>The SELECT tag<a href="#The_SELECT_tag" class="section_anchor"></a></h1><p>This tag has additional methods to build it from a list, and to select  options </p><h3><a name="from_list(_items,_[_use_content_]_)"></a>from_list(<i>items,<tt>[</tt>use_content<tt>]</tt></i>)<a href="#from_list(_items,_[_use_content_]_)" class="section_anchor"></a></h3><p>Builds the OPTION tags inside the SELECT tag, using the list <i>items</i>. Each option matches an element in the list. If <i>use<tt>_</tt>content</i> is set to True, the option value for the n-th item is set to items<tt>[n</tt>] ; if set to False (default), it is set to n. The method returns the SELECT tag itself </p><h3><a name="select(_value=v_arg,content=c_arg_)"></a>select(<i>value=v_arg,content=c_arg</i>)<a href="#select(_value=v_arg,content=c_arg_)" class="section_anchor"></a></h3><p>Select the options with the specified value or content If v_arg is a list, select the options whose value is in the list. Same thing if content is a list </p><p>Examples <table> <tr> <th>Python code</th> <th>generates HTML code</th> </tr> <tr> <td align="top"> </p><pre class="prettyprint">sel = SELECT(name=&quot;foo&quot;).from_list([&quot;one&quot;,&quot;two&quot;])
+sel.select(value=0)</pre><p></td> <td align="top"> </p><pre class="prettyprint">&lt;SELECT name=&quot;foo&quot;&gt;
+&lt;OPTION value=&quot;0&quot; SELECTED&gt;one
+&lt;OPTION value=&quot;1&quot;&gt;two
+&lt;/SELECT&gt;</pre><p></td> </tr> <tr> <td> </p><pre class="prettyprint">sel = SELECT(name=&quot;foo&quot;).from_list([&quot;one&quot;,&quot;two&quot;])
+sel.select(content=&quot;two&quot;)</pre><p></td> <td> </p><pre class="prettyprint">&lt;SELECT name=&quot;foo&quot;&gt;
+&lt;OPTION value=&quot;0&quot;&gt;one
+&lt;OPTION value=&quot;1&quot; SELECTED&gt;two
+&lt;/SELECT&gt;</pre><p></td> </tr> </table> </p><h1><a name="The_RADIO_and_CHECKBOX_classes"></a>The RADIO and CHECKBOX classes<a href="#The_RADIO_and_CHECKBOX_classes" class="section_anchor"></a></h1><p>These classes are provided for the HTML INPUT tags of types radio and checkbox </p><p>The constructor is </p><h3><a name="RADIO(_items,_[_values,_[**_attrs_]]_)"></a>RADIO(<i>items,<tt>[</tt>values,<tt>[**</tt>attrs<tt>]]</tt></i>)<a href="#RADIO(_items,_[_values,_[**_attrs_]]_)" class="section_anchor"></a></h3><p>It builds a list of INPUT tags, one per item in the list <strong>items</strong>. Each INPUT tag has the attributes <strong>attrs</strong> </p><p>If <strong>values</strong> is specified, it must be a list of the same size as <strong>items</strong>. Each INPUT tag value is taken from <strong>values</strong> If it is not specified, the value is the index in <strong>items</strong> </p><p>An instance of RADIO is an iterator on a list of tuples <i>(value,tag)</i> where <i>value</i> is the value in <strong>items</strong>, and <i>tag</i> is the matching INPUT instance </p><p>Instances of RADIO and CHECKBOX support the method </p><h3><a name="check(_value=arg_)_or_check(_content=arg_)"></a>check(<i>value=arg</i>) <i>or</i> check(<i>content=arg</i>)<a href="#check(_value=arg_)_or_check(_content=arg_)" class="section_anchor"></a></h3><p>If the key is <strong>value</strong>, arg is an index (or a list of indices), the method checks the tag(s) at the given index or indices in <strong>items</strong> </p><p>If key is <strong>content</strong>, arg is a string (or a list of strings), the method checks the tag(s) whose value is the given string, or in the list of strings </p><p>Examples <table> <tr> <th>Python code</th> <th>generates HTML code</th> </tr> <tr> <td> </p><pre class="prettyprint">r = RADIO([&quot;one&quot;,&quot;two&quot;],name=&quot;foo&quot;)
+r.check(value=0)
+for v,tag in r:
+    print(v,tag)</pre><p></td> <td> </p><pre class="prettyprint">one &lt;input Type=&quot;radio&quot; name=&quot;foo&quot; value=&quot;0&quot; checked&gt;
+two &lt;input Type=&quot;radio&quot; name=&quot;foo&quot; value=&quot;1&quot;&gt;</pre><p></td> </tr> <tr> <td> </p><pre class="prettyprint">r = RADIO([&quot;one&quot;,&quot;two&quot;],[350,18],name=&quot;foo&quot;)
+r.check(content=&quot;two&quot;)
+for v,tag in r:
+    print(v,tag)</pre><p></td> <td> </p><pre class="prettyprint">one &lt;input Type=&quot;radio&quot; name=&quot;foo&quot; value=&quot;350&quot;&gt;
+two &lt;input Type=&quot;radio&quot; name=&quot;foo&quot; value=&quot;18&quot; checked&gt;</pre><p></td> </tr> </table> </p><h1><a name="Editing_a_tag"></a>Editing a tag<a href="#Editing_a_tag" class="section_anchor"></a></h1><p>A tag can be manipulated in the same way as a DOM element </p><p>It supports the dictionary interface to access the attributes. With the example above, you can add an attribute to the table : </p><pre class="prettyprint">table[&quot;width&quot;] = &quot;80%&quot;</pre><p>To get a specific tag inside the document tree, use the method </p><p><strong>get(<i><tt>*</tt>tags,<tt>**</tt>attrs</i>)</strong> </p><blockquote>Returns a list of all the tags in the tree below self. <i>tags</i> are tag classes, and <i>attrs</i> are key/values arguments. The method returns the tags of the specified classes that have the specified arguments 
+</blockquote><p>In the above example, to get all the TH elements : </p><pre class="prettyprint">ths = body.get(TH)</pre><h1><a name="Using_HTMLTags_in_Karrigell_scripts"></a>Using HTMLTags in Karrigell scripts<a href="#Using_HTMLTags_in_Karrigell_scripts" class="section_anchor"></a></h1><p>All the names defined by HTMLTags are present in the execution namespace of Karrigell scripts </p><p>Suppose you have a script with this function <tt>index()</tt> : </p><pre class="prettyprint">def index():
+   return B(&quot;Hello world&quot;)</pre><p>When a function is executed, the string representation of the return value is sent to the browser. Here, the return value is an instance of the HTMLTags class B ; its string representation is </p><pre class="prettyprint">&lt;B&gt;Hello world&lt;/B&gt;</pre>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+

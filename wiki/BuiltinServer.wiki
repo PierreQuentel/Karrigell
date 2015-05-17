@@ -1,0 +1,32 @@
+#summary Built-in web server
+
+= Server options =
+
+The built-in server is started with the function
+
+ ===Karrigell.run(_handler,port,apps,server,address`_`family_)===
+
+ _handler_ is the class that manages requests (defaults to <font color="#338" size="2"><b>Karrigell.RequestHandler</b></font>) ; _port_ defaults to 80 ; _apps_ is the list of supported applications (defaults to <font color="#338" size="2"><b>`[Karrigell.App]`</b></font>) ; _server_ defaults to <font color="#338" size="2"><b>socketserver.ThreadingTCPServer</b></font> from the Python standard distribution ; _address_family_ defaults to <font color="#338" size="2"><b>socket.AF`_`INET</b></font> (IPv4) but can be set to <font color="#338" size="2"><b>socket.AF`_`INET6</b></font> to support IPv6
+
+
+= SSL mode =
+
+The built-in server can be configured in SSL mode
+
+For this, you must generate a key and certificate file (a file with the extension .pem). You can use OpenSSL for that : the instructions on how to generate such a file are explained in detail on the OpenSSL site
+
+_(Warning : on Windows, once the openssl.exe is installed, you are likely to have a message saying that the configuration file openssl.cnf is not found. You can fix this by adding -config /path/to/openssl/bin/openssl.cfg at the end of the request to create the file)_
+
+The module <font color="#336633"><b>sslserver</b></font> provides the class <font color="#338" size="2"><b>SSLServer</b></font>. Its class attribute <font color="#338" size="2"><b>pem</b></font> must be set to the path of the .pem file. This class is passed to the <font color="#338" size="2"><b>run()</b></font> method of Karrigell
+
+{{{
+import Karrigell
+import Karrigell.sslserver
+
+# start the SSL web server on port 443 to serve this application
+server = Karrigell.sslserver.SSLServer
+server.pem = "server.pem" # replace with correct path
+Karrigell.run(server=server,port=443)
+}}}
+
+This will serve requests like _https://localhost/script_ on port 443

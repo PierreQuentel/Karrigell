@@ -1,0 +1,53 @@
+#summary Coolies management
+#sidebar TableOfContents
+
+Cookies are managed by two variables available in the scripts :
+
+   * COOKIE is a dictionary-like object holding the cookies sent by the browser and received by the script
+   * SET_COOKIE is a dictionary-like object used by the script to set cookies values, path, expiry date etc. and send them to the browser
+
+Here is a simple script, <font color="#106010" face="courier">cookies.py</font>, that shows how to set, read and erase cookies :
+{{{
+def index(**kw):
+    body = 'Received cookies'
+    for cookie in COOKIE:
+        body += BR()+B(cookie)+'&nbsp;'+COOKIE[cookie].value
+        body += A('Erase',href="erase?name=%s" %cookie)
+    form = FORM(action ="set_cookie",method="post")
+    form <= 'Name'+INPUT(name="name")+BR()
+    form <= 'Value' + INPUT(name="value")+BR()
+    form <= INPUT(Type="submit",value="Ok")
+    return HTML(BODY(body+form))
+ 
+def set_cookie(name,value):
+    SET_COOKIE[name] = value
+    SET_COOKIE[name]['path'] = '/'
+    raise HTTP_REDIRECTION('index')
+ 
+def cookie_expiry_date(numdays): 
+    """ Returns a cookie expiry date in the required format.
+    `expires` should be a string in the format "Wdy, DD-Mon-YY HH:MM:SS GMT"
+    """ 
+    from datetime import date, timedelta 
+    new = date.today() + timedelta(days = numdays) 
+    return new.strftime("%a, %d-%b-%Y 23:59:59 GMT") 
+ 
+def erase(name):
+    SET_COOKIE[name] = ''
+    SET_COOKIE[name]['path'] = '/'
+    SET_COOKIE[name]['expires'] = cookie_expiry_date(-10)
+    SET_COOKIE[name]['max-age'] = 0
+    raise HTTP_REDIRECTION('index')
+}}}
+
+In index(), the cookies sent by the browser are printed. Then a form allows the user to set another cookie, with a specified name and value
+
+This form is submitted to the function set_cookie(name,value). In this function, a new entry is created in SET_COOKIE with the submitted data. The key 'path' of this entry is set to the server root. Then a redirection is performed to the index() function
+
+When this redirection is done, the newly created cookie is sent to the browser. The browser stores the value and its attribute ; then it sends a request to the url _http://host/cookies.py/index_
+
+When this request is sent, the request headers include this cookie, received by the script in the variable COOKIE : so the cookie name and value are printed at the top of the page
+
+To erase the cookie, a link is provided, leading to the function erase(name) where name is the cookie name. The function erase() uses SET_COOKIE to erase the value, and set the expiry date to the past (10 days before today), using the function cookie_expiry_date() to transform a datetime object to the format supported by the cookie specifications
+
+At last, when these values are set for the cookie, another redirection is performed to index() : the browser receives the new information about the specified cookie. Since the expiry date is reached, it erases it. When it sends a request to _http://host/cookies.py/index_, it does not send a header for this cookie, which does not appear in the received cookies list

@@ -1,0 +1,109 @@
+
+ 
+
+
+
+ 
+
+
+
+<html>
+ <head>
+<link rel="stylesheet" href="wiki.css">
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+
+ <title>UserManagement</title>
+ </head>
+ <body>
+<div id="title">Karrigell-4.3.10 documentation</div>
+
+ 
+
+
+
+ 
+<style type="text/css">
+ #wikimaincol { padding-top: 6px; padding-left:1em}
+ #sidebarcontainer {
+ padding: 1.5em 2px 2px 2px;
+ min-width: 15em;
+ max-width: 20em;
+ overflow:hidden;
+}
+ .sidebartop ul { margin:0 0 0 .5em; padding-left:0 !important; list-style:none}
+ .sidebartop ul ul { margin-left:1em; padding-left:0; list-style:none; display:none}
+ .sidebartop li { margin:0 0 2px 0; padding:1px; padding-left:14px; cursor:pointer}
+ .sidebartop li a { padding:2px}
+ .sidebartop li { background: url(images/plus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeopen { background: url(images/minus.gif) no-repeat 1px 3px}
+ .sidebartop li.treeleaf { background:none}
+ .currentpagelink { 
+ font-weight: bold;
+ text-decoration: none;
+ color: black !important; 
+ background: #c3d9ff;
+ }
+ .sidebartop ul.treeleafcontainer { display:block;}
+ .sidebarcontent { 
+ vertical-align:top;
+ padding-right: 3px;
+ border-right: 2px solid #ccc;
+ }
+</style>
+
+
+
+<div id="wikipage">
+<table>
+ <tr>
+ 
+ 
+ <td class="sidebarcontent">
+ <div class="vt expand" id="wikisidebar">
+ <div>
+ 
+ 
+ 
+ 
+ 
+ <div id="sidebarcontainer" class="sidebartop ifExpand">
+ <ul><li><a href="Home.html">Home</a> </li><li><a href="GettingStarted.html">Getting started</a> </li><li><a href="TutoRial.html">Tutorial</a> </li><li><a href="RefeRence.html">Reference</a> </li><ul><li><a href="ScriptsNamespace.html">Scripts namespace</a> </li><li><a href="ApplicationSettings.html">Application settings</a> </li><li><a href="PassingParameters.html">Passing parameters to a script</a> </li><li><a href="ImportModule.html">Importing a module</a> </li><li><a href="SessionManagement.html">Session management</a> </li><li><a href="UserManagement.html">Users management and authentication</a> </li><li><a href="LocaLize.html">Localisation (translations)</a> </li><li><a href="WriteHtml.html">HTMLTags</a> (generate HTML from Python code) </li><li><a href="KarrigellTemplate.html">Karrigell templating engine</a>   </li><li><a href="CgiMode.html">Running with Apache - CGI mode</a> </li><li><a href="WsgiMode.html">Running with Apache - WSGI mode</a> </li><li><a href="BuiltinServer.html">Built-in web server options</a> </li></ul><li><a href="HowTos.html">HOWTOs</a> </li><ul><li><a href="PronounceKarrigell.html">Pronounce Karrigell</a> </li><li><a href="InstallIt.html">Install the package</a> </li><li><a href="RunHelloWorld.html">Run the &quot;Hello World&quot; script</a> </li><li><a href="UploadFiles.html">Upload files</a> </li><li><a href="ManageEncoding.html">Manage encoding</a> </li><li><a href="ManageCookies.html">Set, read and erase cookies</a> </li><li><a href="ControlAccess.html">Use an application filter to control access to files/directories</a> </li><li><a href="SmartUrl.html">Manage &quot;smart urls&quot; with an application filter</a> </li></ul></ul>
+ </div>
+ </div>
+</div>
+
+ </td>
+ 
+ <td style="vertical-align:top; padding-left:5px">
+ 
+ 
+ 
+ <div id="wikicontent">
+ <div class="vt" id="wikimaincol">
+ <p>Karrigell provides a set of functions to manage application users and their rights. They rely on a users database and use a script to manage users login and logout </p><p>Different roles can be set to users, to specify different access right to scripts or files. The levels can be &quot;admin&quot;, &quot;edit&quot; or &quot;visit&quot;. Usually, an administrator has all read and write access to all folders, files and scripts ; editors can read and modify some pages ; visitors can only see a set of pages </p><h1><a name="Users_database"></a>Users database<a href="#Users_database" class="section_anchor"></a></h1><p>An application defines its user database by the attribute <font color="#338" size="2"><b>users_db</b></font> (see <a href="ApplicationSettings.html">ApplicationSettings</a>) </p><p>It is an instance of a database management class. The module <font color="#336633"><b>admin_db</b></font> provides one such class : SQLiteUsersDb. This class stores user information in a SQLite database. It is initialized with one argument : the path of the database in the file system </p><h1><a name="Login_script"></a>Login script<a href="#Login_script" class="section_anchor"></a></h1><p>An application defines a script that will be used to ask a user his login and password, and that will check that they match a user in the database </p><p>The url of this script is specified with the application attribute login<tt>_</tt>url. It defaults to <i>(root<tt>_</tt>url)/admin/login.py/login</i>, that is, the function <font color="#338" size="2"><b>login()</b></font> in the script <font color="#106010" face="courier">login.py</font> in folder <font color="#106010" face="courier">www/admin</font> of the Karrigell distribution </p><p>The login script can be customized, but the arguments of the <font color="#338" size="2"><b>login()</b></font> function must remain the same as in this default script : <ul><li><i>role</i> : the requested role </li><li><i>origin</i> : the url of the script where the <font color="#338" size="2"><b>Login()</b></font> function was called. It is used to redirect the user to this original script if the login was successful </li></ul></p><h1><a name="Functions"></a>Functions<a href="#Functions" class="section_anchor"></a></h1><p>The functions available in scripts to manage users are : </p><h2><a name="Login(_[_role_[_,login___url_[,origin]]]_)"></a>Login(<i><tt>[</tt>role<tt>[</tt>,login<tt>_</tt>url<tt>[,origin]]]</tt></i>)<a href="#Login(_[_role_[_,login___url_[,origin]]]_)" class="section_anchor"></a></h2><blockquote>When the framework runs this function, it checks that if the user is already authenticated and has the required role (admin, edit or visit). If a user has the admin role, he also has the edit and visit role ; if it has the edit role, he also has the visit role 
+</blockquote><blockquote>If the user is not authenticated, or does not have the required role, a redirection to the specified login<tt>_</tt>url described above is performed 
+</blockquote><blockquote><i>role</i> defaults to &quot;admin&quot;. <i>login<tt>_</tt>url</i> defaults to the url of the login script defined above 
+</blockquote><blockquote>After a successful authentication, the user is redirected to the url specified in <i>origin</i>. If not specified, the redirection leads to the page where the Login() function was called 
+</blockquote><h2><a name="Logout(_[_redir___to_]_)"></a>Logout(<i><tt>[</tt>redir<tt>_</tt>to<tt>]</tt></i>)<a href="#Logout(_[_redir___to_]_)" class="section_anchor"></a></h2><blockquote>When this function is run, the cookies used to store information about a logged in user are erased, so that he is no longer authenticated 
+The optional <i>redir<tt>_</tt>to</i> argument indicated the url where the user should be redirected after this logout operation was performed. It defaults to the url of the script where the <font color="#338" size="2"><b>Logout()</b></font> function was run 
+</blockquote><h2><a name="User()"></a>User()<a href="#User()" class="section_anchor"></a></h2><blockquote>This function returns an object with the attributes <i>login</i> and <i>role</i>, matching user login and role (admin, edit or visit), or <font color="#333388"><b>None</b></font> if no user is authenticated 
+</blockquote>
+ </div>
+ </div>
+ </td><tr>
+</table>
+ </div>
+
+
+
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/13105533463844027904/js/dit_scripts.js"></script>
+
+
+
+ <script src="prettify.js"></script>
+     <script type="text/javascript">
+     prettyPrint();
+     </script>
+    </body>
+</html>
+
