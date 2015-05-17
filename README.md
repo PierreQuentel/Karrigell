@@ -4,7 +4,7 @@ Web framework for Python 3
 This package requires Python version 3.2 or above
 
 1. Package installation
-=======================
+-----------------------
 
 Open a console window, change directory to this one, and run : 
 
@@ -16,7 +16,7 @@ This will install the packages Karrigell and HTMLTags in the Python
 distribution
 
 2. Start the built-in server
-============================
+----------------------------
 
 In another directory, save these 2 lines in a script called server.py :
 
@@ -41,7 +41,8 @@ The documentation explains how to serve different applications in different
 directories
 
 3. Write a script
-=================
+-----------------
+
 In the same directory as server.py, save these 2 lines in index.py :
 
 ```python
