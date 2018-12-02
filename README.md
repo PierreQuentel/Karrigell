@@ -1,16 +1,20 @@
 # Karrigell
 Web framework for Python 3
 
+*This project is not maintained any more. When it started in 2002 there were
+very few lightweight web frameworks; now there are many popular options, that
+are more complete and better designed than Karrigell.*
+
 ## 1. Package installation
 
-One you have downloaded the package and unzipped it in a directory, open a 
-console window, go to the directory and run : 
+One you have downloaded the package and unzipped it in a directory, open a
+console window, go to the directory and run :
 
 ```
 python setup.py install
 ```
 
-This will install the packages Karrigell and HTMLTags in the Python 
+This will install the packages Karrigell and HTMLTags in the Python
 distribution.
 
 ## 2. Start the built-in server
@@ -22,7 +26,7 @@ import Karrigell
 Karrigell.run()
 ```
 
-This will start a built-in web server, listening for request on port 80. 
+This will start a built-in web server, listening for request on port 80.
 If you want another port, change the second line to :
 
 ```
